@@ -2,7 +2,7 @@
 
 **Where numbers become scenery.**
 
-Version 0.1.3 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.4 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a Tidepark companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -167,15 +167,18 @@ Numbers must be finite. Anything over a limit or of the wrong type is dropped, n
 
 ## 4. Data sources
 
-A companion gets its feed from one of three sources. All produce the same format.
+A companion gets its feed from one of four sources. All produce the same format.
 
 | Source | Setting | Notes |
 |---|---|---|
 | Random | `data=random` (default) | Generated inside the page, no network. Moves smoothly. The same `seed` gives the same sequence |
 | Inline | `v=62&high=100` | Values written directly in the address. Several values: `v=92,102` |
+| Date | `until=2026-12-25` | The page counts the days left until that date. No network |
 | URL | `data=<url>` | The page fetches a feed from that address |
 
 - Random is a source, not a special mode. Every companion therefore runs with no setup.
+- The date source gives the days left as `value` (3.1). On the day itself it is 0. After that it stays 0 and `state` becomes `"done"`. Add the starting day as `since=2026-11-01` and the total number of days becomes `high`. Dates are written `YYYY-MM-DD`, and the day changes in the viewer's own time zone.
+- If more than one is given, `data` wins over `v`, and `v` over `until`.
 - A URL source must allow cross-origin requests (CORS).
 - A site or host may restrict which feed URLs it accepts.
 
@@ -232,6 +235,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | `num` | `1` shows the number. Default `0` | yes |
 | `numAt` | Where the number goes. Default `br` | yes |
 | `v`, `low`, `high`, `base` | Inline values | yes |
+| `until`, `since` | The date to count down to, and the day counting started | yes |
 | `assets` | Where skin images are loaded from | no — config file only |
 
 Order of precedence: address parameters, then the config file, then built-in defaults.
@@ -438,6 +442,7 @@ A warning never blanks the screen. The companion draws what it can.
 - Whether `better` stays.
 - The boundaries of the conditions in section 3.7, and whether a viewer may adjust the `flat` range.
 - How a case table handles many values.
+- The time zone of the date source. It is the viewer's for now, but a server that renders still images may be in another one.
 - The rule that keeps conditions from flickering at a boundary (3.7) remembers the previous state. How to square it with the fifth principle in section 2. A still image is judged with no previous state.
 - The list of effects.
 - The fields of `skin.json`.

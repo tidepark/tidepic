@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4 — 2026-11-16
+
+- New data source: a date. `until=2026-12-25` counts the days left inside the page, with no network. `since` gives the total (4, 5).
+- 받는 곳에 날짜를 더했다. `until=2026-12-25`라고 적으면 페이지가 남은 날을 센다. 네트워크를 쓰지 않는다. `since`를 적으면 전체 날도 알려 준다(4절, 5절).
+
 ## 0.1.3 — 2026-11-16
 
 - New principle: a scene is decided by the current numbers alone. The runtime no longer fills in `momentum`, `low` or `high` from past feeds (2, 3.2, 9).
