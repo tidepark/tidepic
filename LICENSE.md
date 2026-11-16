@@ -7,7 +7,7 @@ The tidepic spec — `SPEC.md`, `SPEC.ko.md` and the other documents in this rep
 
 You may copy, share, adapt and build on this spec, including commercially, as long as you:
 
-- give credit to "tidepic spec" with a link to https://github.com/tidepark/tidepark, and
+- give credit to "tidepic spec" with a link to https://github.com/tidepark/tidepic, and
 - say whether you changed it.
 
 Implementing the spec — building a companion, a feed or a host that follows it — needs no permission. You may say that what you built follows tidepic.
