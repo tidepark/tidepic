@@ -1,15 +1,18 @@
-# Tidepark Spec
+# tidepic spec
 
-**Where numbers become scenery.**
+**Rules for showing numbers as scenes instead of charts.**
 
-Version 0.1.4 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.5 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
-This document defines two things: the data a Tidepark companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
+This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
+
+People have been showing numbers as scenes instead of charts for a long time (section 14). tidepic is not a new idea. It writes down one set of conventions for building such things.
 
 ## 1. Terms
 
 | Term | Meaning |
 |---|---|
+| tidepic | The name of these rules. A companion that follows them is a tidepic companion |
 | Companion | A self-contained web page that turns numbers into a scene |
 | Skin | What a companion shows: images, video, and the case table or layout numbers that arrange them. One companion can have many skins |
 | Condition | A named state the runtime works out from the values, such as `high` or `rise` |
@@ -194,7 +197,7 @@ A companion is a static bundle. It needs no server and can be hosted anywhere or
 ```
 index.html              entry point
 companion.json          what the companion is and what it reads (section 6)
-tidepark.config.json    default settings
+tidepic.config.json    default settings
 draw.js                 drawing code, kept separate (only when made by code)
 skins/<skin>/           one folder per skin (section 7)
   scenes.json           a case table, or
@@ -213,7 +216,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 
 ### Settings
 
-`tidepark.config.json` holds defaults. Address parameters override them.
+`tidepic.config.json` holds defaults. Address parameters override them.
 
 ```json
 {
@@ -447,3 +450,15 @@ A warning never blanks the screen. The companion draws what it can.
 - The list of effects.
 - The fields of `skin.json`.
 - The exact signature of `draw`.
+
+## 14. Prior art
+
+People have long tried to show numbers as scenes or objects instead of charts. tidepic stands on that work.
+
+- Research on ambient displays, which sit at the edge of attention
+- Informative art (2000): screens that look like paintings on a wall and carry information such as the weather
+- A lamp that changes color with the stock market (Ambient Orb, 2002), and the small information displays that followed
+- Badges that take a value from a URL and return a picture
+- Formats that describe motion graphics as JSON
+
+tidepic defines only two things: a feed that carries any number in the same shape, and a way to package a companion that turns those numbers into a scene.

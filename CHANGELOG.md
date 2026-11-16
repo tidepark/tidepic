@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.5 — 2026-11-16
+
+- The rules now have their own name, tidepic. Tidepark is the name of the gallery only. The settings file is `tidepic.config.json` (1, 5).
+- New section on prior art (14).
+- 규칙에 tidepic 이라는 이름을 따로 붙였다. Tidepark 은 갤러리의 이름으로만 쓴다. 설정 파일은 `tidepic.config.json`이다(1절, 5절).
+- 앞서 있던 것들을 적은 절을 더했다(14절).
+
 ## 0.1.4 — 2026-11-16
 
 - New data source: a date. `until=2026-12-25` counts the days left inside the page, with no network. `since` gives the total (4, 5).
