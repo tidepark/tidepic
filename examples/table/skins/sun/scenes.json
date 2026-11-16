@@ -1,0 +1,8 @@
+{
+  "slug": "sun",
+  "name": { "en": "Sun", "ko": "해" },
+  "scenes": [
+    { "when": { "state": ["idle", "done"] }, "show": "sun.json", "poster": "sun.webp" },
+    { "show": "sun.json", "poster": "sun.webp", "follow": "fill" }
+  ]
+}

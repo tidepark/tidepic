@@ -1,0 +1,23 @@
+{
+  "name": "tidepic",
+  "version": "0.1.6",
+  "description": "Rules for showing numbers as scenery, and the runtime that plays them.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./runtime/src/index.js",
+    "./runtime/*": "./runtime/src/*"
+  },
+  "scripts": {
+    "test": "node --test \"runtime/test/*.test.js\""
+  },
+  "peerDependencies": {
+    "lottie-web": "^5.13.0"
+  },
+  "peerDependenciesMeta": {
+    "lottie-web": {
+      "optional": true
+    }
+  }
+}

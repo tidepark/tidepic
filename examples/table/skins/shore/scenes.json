@@ -1,0 +1,18 @@
+{
+  "slug": "shore",
+  "name": { "en": "Shore", "ko": "바닷가" },
+  "scenes": [
+    { "when": { "state": "stale" }, "show": "fog.webp" },
+    { "when": { "state": ["idle", "done"] }, "show": "night.webp" },
+    { "when": { "level": "full" }, "show": "full.webm", "poster": "full.webp",
+      "effects": [{ "type": "float", "image": "dot.webp", "amount": "fill", "size": 0.03 }] },
+    { "when": { "level": "high" }, "show": "high.webp",
+      "effects": [{ "type": "drift", "image": "dot.webp", "amount": "momentum", "size": 0.03 }] },
+    { "when": { "level": "mid" }, "show": "mid.webp" },
+    { "when": { "level": "low" }, "show": "low.webp" },
+    { "when": { "level": "empty" }, "show": "empty.webp" },
+    { "show": "mid.webp" }
+  ],
+  "events": [{ "on": "score", "play": "burst.webm" }],
+  "fade": 1
+}

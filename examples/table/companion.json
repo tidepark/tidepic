@@ -1,0 +1,16 @@
+{
+  "slug": "template-table",
+  "name": { "en": "Table template", "ko": "경우표 틀" },
+  "spec": 1,
+  "made": "table",
+  "grade": "basic",
+  "still": true,
+  "reads": {
+    "values": 1,
+    "needs": ["fill"],
+    "step": false,
+    "events": ["score"],
+    "extra": []
+  },
+  "skins": ["shore", "sun"]
+}

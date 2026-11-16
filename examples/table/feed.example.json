@@ -1,0 +1,6 @@
+{
+  "spec": 1,
+  "values": [{ "value": 8200, "low": 0, "high": 10000, "base": 5400, "momentum": 0.6 }],
+  "state": "live",
+  "ttl": 2
+}

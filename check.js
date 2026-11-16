@@ -1,8 +1,8 @@
 // 피드 확인기. 붙여 넣은 피드를 이 브라우저 안에서만 검사하고 계산한다. 어디에도 보내지 않는다.
 
-import { computeFeed } from "./runtime/compute.js";
-import { judgeFeed } from "./runtime/conditions.js";
-import { parseFeed } from "./runtime/validate.js";
+import { computeFeed } from "./runtime/src/compute.js";
+import { judgeFeed } from "./runtime/src/conditions.js";
+import { parseFeed } from "./runtime/src/validate.js";
 
 const TEXT = {
   ko: {
