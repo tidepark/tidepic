@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.6 — 2026-11-16
+
+- A case table can show a Lottie file. `follow` holds it at the position of a derived value instead of looping (5, 7.1).
+- Prior art: what tidepic does differently from formats that describe how a picture is drawn (14).
+- 경우표의 `show`에 Lottie 파일을 적을 수 있다. `follow`를 적으면 되풀이해 트는 대신 계산된 값의 자리에 멈춰 보여 준다(5절, 7.1절).
+- 앞서 있던 것들: 그림을 어떻게 그리는지 정하는 형식과 tidepic 이 무엇이 다른지 적었다(14절).
+
 ## 0.1.5 — 2026-11-16
 
 - The rules now have their own name, tidepic. Tidepark is the name of the gallery only. The settings file is `tidepic.config.json` (1, 5).

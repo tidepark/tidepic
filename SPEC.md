@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.1.5 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.6 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -210,7 +210,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 
 | Way | What you write | `made` |
 |---|---|---|
-| Case table | For each condition, a picture or a video. No code | `"table"` |
+| Case table | For each condition, a picture, a video, or a Lottie file. No code | `"table"` |
 | Case table with effects | The same, plus moving effects the runtime provides | `"table"` |
 | Code | Your own drawing code | `"code"` |
 
@@ -333,7 +333,9 @@ For a companion made as a table. The skin says what to show in each case.
 - Entries are tried from top to bottom. The first whose `when` matches is shown.
 - Every condition in `when` must hold. A list means "any of these".
 - The last entry has no `when`. It is the default, and it is required.
-- `show` is an image or a video. A video plays muted and loops, and needs a `poster` image for still frames.
+- `show` is an image, a video, or a Lottie file (`.json`). Videos and Lottie files play muted and loop, and need a `poster` image for still frames.
+- On a Lottie line, `follow` stops the loop and holds the animation at the position of a derived value. For `"fill"` and `"share"`, 0 is the start and 1 is the end. For `"rise"` and `"momentum"`, -1 is the start, 0 is the middle, and 1 is the end. Example: `{ "show": "sun.json", "poster": "sun.webp", "follow": "fill" }`
+- A Lottie file carries its images inside the file and uses no fonts and no expressions. The runtime does not run expressions (provisional).
 - `effects` adds moving pieces drawn by the runtime. `amount` is a number from 0 to 1, or the name of a derived value (`"fill"`, `"rise"`, `"momentum"`, `"share"`) to follow it continuously.
 - `events` plays something once, on top, when an event of that type arrives.
 - `fade` is the cross-fade in seconds when the scene changes. The default is 1.
@@ -448,6 +450,7 @@ A warning never blanks the screen. The companion draws what it can.
 - The time zone of the date source. It is the viewer's for now, but a server that renders still images may be in another one.
 - The rule that keeps conditions from flickering at a boundary (3.7) remembers the previous state. How to square it with the fifth principle in section 2. A still image is judged with no previous state.
 - The list of effects.
+- Which Lottie features are allowed, and the size limit of a Lottie file.
 - The fields of `skin.json`.
 - The exact signature of `draw`.
 
@@ -459,6 +462,8 @@ People have long tried to show numbers as scenes or objects instead of charts. t
 - Informative art (2000): screens that look like paintings on a wall and carry information such as the weather
 - A lamp that changes color with the stock market (Ambient Orb, 2002), and the small information displays that followed
 - Badges that take a value from a URL and return a picture
-- Formats that describe motion graphics as JSON
+- Formats that describe motion graphics as JSON (Lottie). These now also have state machines that take numbers from code and change the picture
+
+tidepic does a different job from these. They define how a picture is drawn, or what one product shows. tidepic does not define how to draw. It only defines what shape the numbers arrive in and how those numbers connect to a scene. A companion can therefore be made with canvas code, with a few images, or with a Lottie file.
 
 tidepic defines only two things: a feed that carries any number in the same shape, and a way to package a companion that turns those numbers into a scene.

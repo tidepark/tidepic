@@ -4,6 +4,15 @@
 
 [한국어](README.ko.md)
 
+![A window seat on a tilted mountain train. A lake and snowy peaks pass outside, and the hand straps hang straight down.](scene.webp)
+
+This could be a stock price,\
+or today's temperature,\
+or today's weight,\
+or today's step count.
+
+When that number climbs, the train heads uphill. When it falls, downhill.
+
 A companion that follows tidepic turns live numbers into a scene you can leave on screen. A countdown becomes petals on a flower. A step count becomes rising water. A price becomes the slope of a mountain railway.
 
 This repository holds the **tidepic spec**: the data format a companion receives and the rules for packaging one.
