@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3 — 2026-11-16
+
+- New principle: a scene is decided by the current numbers alone. The runtime no longer fills in `momentum`, `low` or `high` from past feeds (2, 3.2, 9).
+- New derived value `share`: a value divided by the sum of all values, for scores and proportions (3.2).
+- 원칙을 더했다. 장면은 지금의 숫자만으로 정해진다. 런타임은 지난 피드로 `momentum`, `low`, `high`를 채우지 않는다(2절, 3.2절, 9절).
+- 계산되는 값에 몫(`share`)을 더했다. 그 값을 값들의 합으로 나눈 것이고, 점수와 비중에 쓴다(3.2절).
+
 ## 0.1.2 — 2026-11-16
 
 - Named conditions (`level`, `trend`, `pace`, `lead`, `state`) worked out by the runtime (3.7).

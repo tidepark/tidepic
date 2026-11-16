@@ -2,7 +2,7 @@
 
 **Where numbers become scenery.**
 
-Version 0.1.2 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.3 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a Tidepark companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -23,6 +23,7 @@ This document defines two things: the data a Tidepark companion receives, and ho
 2. **Senders send raw numbers.** Scaling to 0–1 is the runtime's job.
 3. **Common fields are always enough to draw.** Domain-specific data (`extra`) only enriches the scene.
 4. **Unknown fields are ignored.** They are never an error.
+5. **A scene is decided by the current numbers alone.** A companion only shows the current numbers in another form. It does not draw a graph or fill in between past values. The same feed gives the same scene, whenever and however often it is fetched.
 
 ## 3. Feed format
 
@@ -82,11 +83,14 @@ A companion draws from these, not from the raw numbers.
 |---|---|---|---|
 | `fill` | 0 to 1 | (`value` − `low`) ÷ (`high` − `low`) | `high` |
 | `rise` | −1 to 1 | (`value` − `base`) ÷ scale | `base` |
-| `momentum` | −1 to 1 | As sent, or computed from recent history | — |
+| `momentum` | −1 to 1 | As sent. 0 if missing | — |
+| `share` | 0 to 1 | `value` ÷ sum of all values | — |
 
 - The scale for `rise` is `scale` if sent, otherwise `high` − `low`. Results are clamped to −1…1. This rule is provisional (see section 13).
-- The runtime fills in what it can compute from history: `momentum`, and `low`/`high` when missing.
-- It cannot invent `base`. Without `base` there is no `rise`.
+- Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the slope (`momentum`).
+- A missing `low` counts as 0. Without `high` there is no `fill`, and without `base` there is no `rise`.
+- `share` is for comparing numbers that have no upper end, such as scores. 1 against 10 gives 0.09 and 0.91. If any value is negative or the sum is 0, there is no `share`.
+- The runtime may ease the scene into place when a new value arrives. It does not change the value it arrives at. A still image always shows the arrived value.
 
 ### 3.3 `step`
 
@@ -280,7 +284,7 @@ bl  bc  br
 | `grade` | `"basic"` or `"free"` (section 8) |
 | `still` | Whether it can produce a still image |
 | `reads.values` | How many values it reads: `1`, `2` or `"many"` |
-| `reads.needs` | Derived values it cannot do without: `"fill"`, `"rise"` |
+| `reads.needs` | Derived values it cannot do without: `"fill"`, `"rise"`, `"share"` |
 | `reads.step` | Whether it uses `step` |
 | `reads.events` | Event types it reacts to |
 | `reads.extra` | `extra` domains it reads |
@@ -323,7 +327,7 @@ For a companion made as a table. The skin says what to show in each case.
 - Every condition in `when` must hold. A list means "any of these".
 - The last entry has no `when`. It is the default, and it is required.
 - `show` is an image or a video. A video plays muted and loops, and needs a `poster` image for still frames.
-- `effects` adds moving pieces drawn by the runtime. `amount` is a number from 0 to 1, or the name of a derived value (`"fill"`, `"rise"`, `"momentum"`) to follow it continuously.
+- `effects` adds moving pieces drawn by the runtime. `amount` is a number from 0 to 1, or the name of a derived value (`"fill"`, `"rise"`, `"momentum"`, `"share"`) to follow it continuously.
 - `events` plays something once, on top, when an event of that type arrives.
 - `fade` is the cross-fade in seconds when the scene changes. The default is 1.
 
@@ -369,7 +373,7 @@ A companion made as a case table has no drawing code; the runtime shows its scen
 
 ```js
 draw(ctx, {
-  values,   // [{ fill, rise, momentum, raw }]
+  values,   // [{ fill, rise, momentum, share, raw }]
   step, state, event, extra,
   skin,     // images and layout numbers
   width, height,
@@ -384,8 +388,8 @@ The runtime compares what a companion declares with what actually arrives.
 
 | Situation | What happens |
 |---|---|
-| A value that can be computed is missing (`momentum`, `low`, `high`) | The runtime fills it in. No notice |
-| A value that cannot be computed is missing (no `base`, but the companion needs `rise`) | Warning |
+| `momentum` or `low` is missing | Counts as 0. No notice |
+| A needed value cannot be computed (no `high` but `fill` is needed, or no `base` but `rise` is needed) | Warning |
 | The count differs (reads 2, got 1) | Warning |
 | A case uses a condition that cannot be worked out (`trend` without `base`) | Warning. That case never matches |
 | `extra` did not arrive | Draws from common fields and notes "showing default behavior" |
@@ -434,6 +438,7 @@ A warning never blanks the screen. The companion draws what it can.
 - Whether `better` stays.
 - The boundaries of the conditions in section 3.7, and whether a viewer may adjust the `flat` range.
 - How a case table handles many values.
+- The rule that keeps conditions from flickering at a boundary (3.7) remembers the previous state. How to square it with the fifth principle in section 2. A still image is judged with no previous state.
 - The list of effects.
 - The fields of `skin.json`.
 - The exact signature of `draw`.
