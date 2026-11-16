@@ -27,3 +27,7 @@ Five glasses of water out of eight, five chapters out of eight, five days out of
 Draft 0.1. The spec will be fixed at 1.0 after the first official companions are built against it.
 
 Official companions are published at [tidepark.com](https://tidepark.com) (not open yet).
+
+## License
+
+The spec is licensed under [CC BY 4.0](LICENSE.md). You are free to implement it. The name "Tidepark" and its logos are not covered.

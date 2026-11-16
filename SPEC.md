@@ -2,7 +2,7 @@
 
 **Where numbers become scenery.**
 
-Version 0.1.0 (draft) · 2026-11-16 · [한국어](SPEC.ko.md)
+Version 0.1.1 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a Tidepark companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
