@@ -2,7 +2,7 @@
 
 **Where numbers become scenery.**
 
-Version 0.1.1 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.2 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a Tidepark companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -11,7 +11,8 @@ This document defines two things: the data a Tidepark companion receives, and ho
 | Term | Meaning |
 |---|---|
 | Companion | A self-contained web page that turns numbers into a scene |
-| Skin | The artwork and layout numbers a companion draws with. One companion can have many skins |
+| Skin | What a companion shows: images, video, and the case table or layout numbers that arrange them. One companion can have many skins |
+| Condition | A named state the runtime works out from the values, such as `high` or `rise` |
 | Feed | A JSON document in the format of section 3 |
 | Host | Whatever shows a companion: a browser tab, a kiosk screen, or an app that embeds it |
 | Runtime | The small piece of code inside a companion that reads the feed and prepares values for drawing |
@@ -131,7 +132,25 @@ When no data arrives for a while, the runtime reports the feed as stale by itsel
 
 Example: for baseball, the common fields carry only the score. Inning, runners and outs travel in `extra`.
 
-### 3.7 Limits
+### 3.7 Conditions
+
+The runtime also turns the derived values into named conditions. Every companion uses the same names, so a scene can be chosen by case instead of by arithmetic.
+
+| Condition | Names | Worked out from |
+|---|---|---|
+| `level` | `empty`, `low`, `mid`, `high`, `full` | `fill`: below 0.05, below 0.35, below 0.65, below 0.95, and the rest |
+| `trend` | `fall`, `flat`, `rise` | `rise`: below −0.1, in between, above 0.1 |
+| `pace` | `calm`, `brisk` | Size of `momentum`: below 0.3, or not |
+| `lead` | `first`, `tie`, `second` | With two values, which one is ahead |
+| `state` | `live`, `idle`, `done`, `stale` | Section 3.4. `stale` is set by the runtime |
+
+- Conditions are worked out for each value.
+- A condition that cannot be worked out is simply absent. Without `base` there is no `trend`.
+- **No flicker at the edges.** Once a condition changes, the value must move a further 0.03 past the boundary before it changes back.
+- **Conditions pick the scene; derived values fine-tune it.** The derived values stay available for speed and amount, so 62% and 68% need not look identical.
+- The boundaries above are provisional (section 13).
+
+### 3.8 Limits
 
 | Item | Limit |
 |---|---|
@@ -169,9 +188,21 @@ A companion is a static bundle. It needs no server and can be hosted anywhere or
 index.html              entry point
 companion.json          what the companion is and what it reads (section 6)
 tidepark.config.json    default settings
-draw.js                 drawing code, kept separate (basic grade)
-skins/<skin>/skin.json  one folder per skin (section 7)
+draw.js                 drawing code, kept separate (only when made by code)
+skins/<skin>/           one folder per skin (section 7)
+  scenes.json           a case table, or
+  skin.json             layout numbers for drawing code
 ```
+
+### Three ways to make a companion
+
+A companion is, in the end, a table of cases: when the values are in this condition, show that.
+
+| Way | What you write | `made` |
+|---|---|---|
+| Case table | For each condition, a picture or a video. No code | `"table"` |
+| Case table with effects | The same, plus moving effects the runtime provides | `"table"` |
+| Code | Your own drawing code | `"code"` |
 
 ### Settings
 
@@ -226,6 +257,7 @@ bl  bc  br
   "slug": "ballpark",
   "name": { "en": "Ballpark", "ko": "야구장" },
   "spec": 1,
+  "made": "code",
   "grade": "basic",
   "still": true,
   "reads": {
@@ -244,6 +276,7 @@ bl  bc  br
 | `slug` | Lowercase name used in addresses |
 | `name` | Display name, in English and Korean |
 | `spec` | Feed version it understands |
+| `made` | `"table"` or `"code"` (section 5) |
 | `grade` | `"basic"` or `"free"` (section 8) |
 | `still` | Whether it can produce a still image |
 | `reads.values` | How many values it reads: `1`, `2` or `"many"` |
@@ -255,8 +288,57 @@ bl  bc  br
 
 ## 7. Skins
 
-- A skin is data only: image files and a `skin.json` with layout numbers. No code, no URLs, no font files.
-- The same companion with a different skin behaves the same and looks different.
+A skin is everything a companion shows: images, video, and the numbers that arrange them.
+
+- A skin contains no code, no URLs and no font files. Files are referred to by plain file names inside the skin's own folder.
+- The same companion with a different skin reads the same data and looks different.
+- A different skin can change far more than a picture. It can bring its own effects or video.
+
+There are two kinds, matching how the companion is made (section 5).
+
+### 7.1 Case table (`scenes.json`)
+
+For a companion made as a table. The skin says what to show in each case.
+
+```json
+{
+  "slug": "spring",
+  "name": { "en": "Spring", "ko": "봄" },
+  "scenes": [
+    { "when": { "state": ["idle", "done"] }, "show": "night.webp" },
+    { "when": { "level": "full" }, "show": "bloom.webm", "poster": "bloom.webp" },
+    { "when": { "trend": "rise", "pace": "brisk" },
+      "show": "breeze.webp",
+      "effects": [ { "type": "drift", "image": "petal.webp", "amount": "fill" } ] },
+    { "show": "calm.webp" }
+  ],
+  "events": [
+    { "on": "score", "play": "burst.webm" }
+  ],
+  "fade": 1.5
+}
+```
+
+- Entries are tried from top to bottom. The first whose `when` matches is shown.
+- Every condition in `when` must hold. A list means "any of these".
+- The last entry has no `when`. It is the default, and it is required.
+- `show` is an image or a video. A video plays muted and loops, and needs a `poster` image for still frames.
+- `effects` adds moving pieces drawn by the runtime. `amount` is a number from 0 to 1, or the name of a derived value (`"fill"`, `"rise"`, `"momentum"`) to follow it continuously.
+- `events` plays something once, on top, when an event of that type arrives.
+- `fade` is the cross-fade in seconds when the scene changes. The default is 1.
+
+Effects the runtime provides (provisional list):
+
+| Type | What it does |
+|---|---|
+| `drift` | Pieces float across: petals, snow, leaves |
+| `fall` | Pieces drop from above |
+| `float` | Pieces rise from below: bubbles, steam |
+| `count` | Shows pieces in fixed places. How many follows `amount` |
+
+### 7.2 Layout numbers (`skin.json`)
+
+For a companion drawn by code. The skin supplies the images and the numbers the code draws with.
 
 ```json
 {
@@ -273,14 +355,14 @@ The keys under `images` and `layout` are defined by each companion.
 
 | | Basic | Free |
 |---|---|---|
-| Drawing | 2D canvas, with drawing code in its own file | Anything: 3D, WebAssembly, physics engines |
+| Drawing | A case table, or 2D canvas code in its own file | Anything: 3D, WebAssembly, physics engines |
 | Still image | Yes | Optional |
 | Packed inside a host app | Yes | No — loaded by address only |
 | Must follow | This whole document | Sections 3–6, 9, 11, and the display rules marked "all grades" |
 
 ### Drawing code (basic grade)
 
-So that a still image can be rendered anywhere, the drawing function:
+A companion made as a case table has no drawing code; the runtime shows its scenes. For a companion made by code, so that a still image can be rendered anywhere, the drawing function:
 
 - **Draws only from what it is given** — values, skin, size and time. It does not depend on page elements.
 - **Gives the same picture for the same input.** If it needs randomness, it takes a seed.
@@ -305,6 +387,7 @@ The runtime compares what a companion declares with what actually arrives.
 | A value that can be computed is missing (`momentum`, `low`, `high`) | The runtime fills it in. No notice |
 | A value that cannot be computed is missing (no `base`, but the companion needs `rise`) | Warning |
 | The count differs (reads 2, got 1) | Warning |
+| A case uses a condition that cannot be worked out (`trend` without `base`) | Warning. That case never matches |
 | `extra` did not arrive | Draws from common fields and notes "showing default behavior" |
 
 A warning never blanks the screen. The companion draws what it can.
@@ -323,16 +406,19 @@ A warning never blanks the screen. The companion draws what it can.
 
 | Size | Limit |
 |---|---|
-| A skin loaded by address | 3 MB |
-| A skin packed inside a host app | 200 KB |
+| A skin loaded by address, images only | 3 MB |
+| A skin loaded by address, with video | 20 MB |
+| A skin packed inside a host app | 200 KB, no video |
 | One image | 2400 px on the long side, WebP |
+| One video | 1920 px on the long side, 10 seconds, no sound, loops without a visible seam |
 
 ## 11. Safety
 
 - **Validate before use.** The runtime checks every feed against section 3 and passes on only what conforms.
 - **Never insert feed data as HTML.** Strings from a feed are data, not markup.
 - **The title is plain text**, at most 40 characters. It is never treated as markup.
-- **Skin images come from the address in the config file.** It cannot be changed through address parameters.
+- **Skin files come from the address in the config file.** It cannot be changed through address parameters.
+- **A skin names its files by plain file name.** No URLs, and no paths that leave the skin's folder.
 - **A server that renders or relays must not fetch addresses supplied by visitors.**
 - **Hosts should isolate companions they did not make**, for example in a sandboxed frame.
 
@@ -346,5 +432,8 @@ A warning never blanks the screen. The companion draws what it can.
 
 - The scale for `rise`. Values with very different volatility should still read as the same slope.
 - Whether `better` stays.
+- The boundaries of the conditions in section 3.7, and whether a viewer may adjust the `flat` range.
+- How a case table handles many values.
+- The list of effects.
 - The fields of `skin.json`.
 - The exact signature of `draw`.
