@@ -1,0 +1,41 @@
+:root { --paper: #f6f0e2; --ink: #1e4d3b; --muted: #5b6f64; --line: rgba(30, 77, 59, 0.2);
+  --tide: #256f90; --warn: #a2501a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { min-height: 100vh; background: var(--paper); color: var(--ink); word-break: keep-all;
+  font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; line-height: 1.6; }
+main { max-width: 44rem; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+a { color: var(--ink); }
+.home { font-weight: 600; text-decoration: none; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.5rem 0 0; }
+h2 { font-size: 1.1rem; margin: 0; }
+p { color: var(--muted); margin: 0.75rem 0 0; }
+.examples { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; align-items: center; }
+.examples span { color: var(--muted); font-size: 0.9rem; }
+button { font: inherit; color: var(--ink); background: none; border: 1px solid var(--line);
+  border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+button:hover { border-color: var(--ink); }
+label { display: block; margin: 1.25rem 0 0.4rem; font-size: 0.9rem; color: var(--muted); }
+textarea { display: block; width: 100%; min-height: 13rem; padding: 0.9rem 1rem; resize: vertical;
+  border: 1px solid var(--line); border-radius: 0.75rem; background: rgba(255, 255, 255, 0.5);
+  color: var(--ink); font: 0.95rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+textarea:focus, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+#result { margin: 1.5rem 0 0; }
+.verdict { font-size: 1.15rem; font-weight: 600; color: var(--ink); margin: 0; }
+.verdict.bad, .note.bad { color: var(--warn); }
+.note { font-size: 0.95rem; }
+.card { margin: 1rem 0 0; padding: 1rem 1.25rem; border: 1px solid var(--line); border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.5); }
+.rows { display: grid; grid-template-columns: max-content 4.5rem 1fr; gap: 0.5rem 1rem;
+  align-items: center; margin: 0.75rem 0 0; }
+.rows code, .chips code { font: 0.95rem ui-monospace, SFMono-Regular, Menlo, monospace; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.none { grid-column: 2 / 4; color: var(--muted); font-size: 0.95rem; }
+.meter { position: relative; height: 0.6rem; border-radius: 999px; background: rgba(30, 77, 59, 0.12); overflow: hidden; }
+.meter i { position: absolute; top: 0; bottom: 0; background: var(--tide); }
+.meter.signed::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.9rem 0 0; }
+.chips span { border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.7rem; font-size: 0.9rem; color: var(--muted); }
+.chips code { color: var(--ink); }
+footer { margin: 3rem 0 0; padding: 1.25rem 0 0; border-top: 1px solid var(--line); font-size: 0.9rem; color: var(--muted); }
+footer a { color: var(--muted); }

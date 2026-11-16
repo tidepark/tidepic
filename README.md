@@ -39,8 +39,10 @@ Draft 0.1. The spec will be fixed at 1.0 after the first official companions are
 
 Companions built with these rules are at [tidepark.com/gallery](https://tidepark.com/gallery).
 
+To see whether a feed follows the rules and what values a companion would draw with, paste it into the [feed checker](https://tidepic.com/check.html). The code it uses to check and compute is in [`runtime/`](runtime).
+
 Showing numbers as scenes is not a new idea. tidepic only writes down one set of conventions. Section 14 of the spec lists the work that came before.
 
 ## License
 
-The spec is licensed under [CC BY 4.0](LICENSE.md). You are free to implement it, and to say that what you built follows tidepic. The name "Tidepark" and its logos are not covered.
+The spec is licensed under [CC BY 4.0](LICENSE.md), and the code under [MIT](LICENSE-MIT). You are free to implement it, and to say that what you built follows tidepic. The name "Tidepark" and its logos are not covered.

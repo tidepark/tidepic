@@ -39,8 +39,10 @@ tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규�
 
 이 규칙으로 만든 컴패니언은 [tidepark.com/gallery](https://tidepark.com/ko/gallery)에서 볼 수 있다.
 
+피드가 규칙에 맞는지, 컴패니언이 어떤 값으로 그리게 되는지는 [피드 확인기](https://tidepic.com/check.ko.html)에 붙여 넣어 볼 수 있다. 확인기가 쓰는 검사와 계산 코드는 [`runtime/`](runtime)에 있다.
+
 숫자를 장면으로 보여 주려는 시도는 전부터 있었다. tidepic 은 새로운 생각이 아니라 약속 하나를 적어 둔 것이다. 앞서 있던 것들은 규칙 14절에 적었다.
 
 ## 라이선스
 
-규칙은 [CC BY 4.0](LICENSE.md) 을 따른다. 규칙을 따라 만드는 것은 자유이고, 만든 것이 tidepic 을 따른다고 밝혀도 된다. "Tidepark"이라는 이름과 로고는 들어 있지 않다.
+규칙은 [CC BY 4.0](LICENSE.md) 을, 코드는 [MIT](LICENSE-MIT) 를 따른다. 규칙을 따라 만드는 것은 자유이고, 만든 것이 tidepic 을 따른다고 밝혀도 된다. "Tidepark"이라는 이름과 로고는 들어 있지 않다.

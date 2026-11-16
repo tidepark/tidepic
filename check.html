@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feed checker — tidepic</title>
+<meta name="description" content="Check whether a tidepic feed follows the rules and see the values a companion draws with.">
+<link rel="alternate" hreflang="en" href="https://tidepic.com/check.html">
+<link rel="alternate" hreflang="ko" href="https://tidepic.com/check.ko.html">
+<link rel="stylesheet" href="check.css">
+</head>
+<body>
+<main>
+  <a class="home" href="./">← tidepic</a>
+  <h1>Feed checker</h1>
+  <p>Paste a feed as JSON. This page tells you whether it follows the rules and shows the values a companion would draw its scene with.</p>
+  <p>What you paste is computed inside this browser only. It is not sent anywhere.</p>
+  <div class="examples">
+    <span>Examples:</span>
+    <button type="button" data-example="steps">Steps</button>
+    <button type="button" data-example="price">Stock price</button>
+    <button type="button" data-example="score">Game score</button>
+    <button type="button" data-example="days">Days left</button>
+  </div>
+  <label for="feed">Feed (JSON)</label>
+  <textarea id="feed" spellcheck="false" autocomplete="off"></textarea>
+  <div id="result" aria-live="polite"></div>
+  <footer>
+    The calculations are in section 3 of the <a href="https://github.com/tidepark/tidepic/blob/main/SPEC.md">spec</a>. The checking and computing code this page uses is in the <a href="https://github.com/tidepark/tidepic/tree/main/runtime">runtime folder of the repository</a>. This is draft 0.1.
+    <br><a href="check.ko.html" lang="ko">한국어</a>
+  </footer>
+</main>
+<script type="module" src="check.js"></script>
+</body>
+</html>
