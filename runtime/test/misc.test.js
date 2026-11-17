@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { randomFeed } from "../src/random.js";
 import { validateFeed } from "../src/validate.js";
 import { computeFeed } from "../src/compute.js";
-import { checkReads } from "../src/check.js";
+import { checkFeed, checkReads } from "../src/check.js";
 import { formatNumber, numberText } from "../src/overlay.js";
 import { createSource } from "../src/source.js";
 
@@ -36,6 +36,15 @@ const check = (reads, data) => {
   return checkReads(reads, feed, computeFeed(feed)).map((n) => `${n.level}:${n.code}`);
 };
 
+test("점검: 폭이 없어 낼 수 없는 값은 조용히 넘기지 않고 알린다", () => {
+  const codes = (v) => checkFeed({ values: [v] }).map((n) => n.code);
+  assert.deepEqual(codes({ value: 12840, base: 12790 }), ["no-scale"]);
+  assert.deepEqual(codes({ value: 12840, base: 12790, scale: 100 }), []);
+  assert.deepEqual(codes({ value: 5, to: 10, base: 3 }), []);
+  assert.deepEqual(codes({ value: 5, rate: 1 }), ["no-rate-scale"]);
+  assert.deepEqual(codes({ value: 5, rate: 1, rateScale: 2 }), []);
+});
+
 test("점검: 개수가 다르면 경고한다", () => {
   assert.deepEqual(check({ values: 2 }, { spec: 1, values: [{ value: 1 }] }), ["warn:count"]);
   assert.deepEqual(check({ values: 2 }, { spec: 1, values: [{ value: 1 }, { value: 2 }] }), []);
@@ -45,8 +54,8 @@ test("점검: 개수가 다르면 경고한다", () => {
 test("점검: 계산할 수 없는 값이 필요하면 경고한다", () => {
   const reads = { values: 1, needs: ["fill", "rise"] };
   assert.deepEqual(check(reads, { spec: 1, values: [{ value: 1 }] }), ["warn:needs-fill", "warn:needs-rise"]);
-  assert.deepEqual(check(reads, { spec: 1, values: [{ value: 1, high: 2 }] }), ["warn:needs-rise"]);
-  assert.deepEqual(check(reads, { spec: 1, values: [{ value: 1, high: 2, base: 1 }] }), []);
+  assert.deepEqual(check(reads, { spec: 1, values: [{ value: 1, to: 2 }] }), ["warn:needs-rise"]);
+  assert.deepEqual(check(reads, { spec: 1, values: [{ value: 1, to: 2, base: 1 }] }), []);
   assert.deepEqual(check({ needs: ["share"] }, { spec: 1, values: [{ value: 0 }, { value: 0 }] }), ["warn:needs-share"]);
   assert.deepEqual(check({ needs: ["share"] }, { spec: 1, values: [{ value: 1 }, { value: 10 }] }), []);
 });
@@ -76,14 +85,14 @@ test("받는 곳: 난수와 주소에 적은 값은 검사를 거친 피드를 �
   const random = await createSource({ kind: "random" }, { seed: "a", count: 2 }).next(3);
   assert.equal(random.ok, true);
   assert.equal(random.feed.values.length, 2);
-  const inline = await createSource({ kind: "inline", values: [{ value: 62, high: 100 }] }, {}).next(0);
-  assert.deepEqual(inline.feed.values, [{ value: 62, high: 100 }]);
+  const inline = await createSource({ kind: "inline", values: [{ value: 62, to: 100 }] }, {}).next(0);
+  assert.deepEqual(inline.feed.values, [{ value: 62, to: 100 }]);
 });
 
 test("받는 곳: 주소에서 받은 피드도 검사한다", async () => {
   const reply = (body, init = {}) => async () => new Response(body, init);
   const from = (fetchImpl) => createSource({ kind: "url", url: "https://feed.example.com/a" }, { fetchImpl }).next(0);
-  assert.equal((await from(reply('{"spec":1,"values":[{"value":5,"high":10}]}'))).ok, true);
+  assert.equal((await from(reply('{"spec":1,"values":[{"value":5,"to":10}]}'))).ok, true);
   assert.equal((await from(reply('{"spec":1,"values":[]}'))).ok, false);
   assert.equal((await from(reply("<html>", { status: 200 }))).ok, false);
   assert.equal((await from(reply("no", { status: 404 }))).ok, false);

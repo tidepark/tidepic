@@ -1,6 +1,6 @@
 {
   "spec": 1,
-  "values": [{ "value": 8200, "low": 0, "high": 10000, "base": 5400, "momentum": 0.6 }],
+  "values": [{ "value": 8200, "to": 10000, "base": 5400, "rate": 600, "rateScale": 1000 }],
   "state": "live",
   "ttl": 2
 }

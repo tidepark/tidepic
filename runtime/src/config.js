@@ -18,10 +18,14 @@ const URL_KEYS = [
   "num",
   "numAt",
   "v",
-  "low",
-  "high",
+  "from",
+  "to",
   "base",
   "scale",
+  "rate",
+  "rateScale",
+  "low",
+  "high",
   "momentum",
   "until",
   "since",
@@ -67,14 +71,21 @@ function parseList(x) {
     : undefined;
 }
 
-// 주소에 직접 적은 값을 피드의 values 로 바꾼다. 하나만 적은 low·high 같은 값은 모든 값에 쓴다.
+// 주소에 직접 적은 값을 피드의 values 로 바꾼다. 하나만 적은 from·to 같은 값은 모든 값에 쓴다.
+// low, high, momentum 은 0.2 전의 이름이다. 이미 복사해 간 주소가 있어, 주소에서만 한동안 받는다.
 function inlineValues(raw) {
   const v = first(parseList, raw.v);
   if (!v) return undefined;
-  const lists = {};
-  for (const key of ["low", "high", "base", "scale", "momentum"]) {
-    lists[key] = first(parseList, raw[key]);
-  }
+  const lists = {
+    from: first(parseList, raw.from, raw.low),
+    to: first(parseList, raw.to, raw.high),
+    base: first(parseList, raw.base),
+    scale: first(parseList, raw.scale),
+    rate: first(parseList, raw.rate, raw.momentum),
+    rateScale: first(parseList, raw.rateScale),
+  };
+  // 옛 momentum 은 이미 −1~1 이다.
+  if (raw.rate === undefined && lists.rate && !lists.rateScale) lists.rateScale = [1];
   return v.map((value, i) => {
     const out = { value };
     for (const [key, list] of Object.entries(lists)) {

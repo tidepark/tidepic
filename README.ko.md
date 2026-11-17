@@ -30,7 +30,7 @@ tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규�
 컴패니언은 작은 JSON 문서를 읽는다. 그 숫자가 무엇을 뜻하는지는 모른다.
 
 ```json
-{ "spec": 1, "values": [ { "value": 5, "high": 8 } ] }
+{ "spec": 1, "values": [ { "value": 5, "to": 8 } ] }
 ```
 
 물 여덟 잔 중 다섯 잔이든, 여덟 장 중 다섯 장이든, 여드레 중 닷새든 장면은 같다. 무엇을 뜻하는지는 데이터를 보내는 쪽이 정한다.
@@ -40,7 +40,7 @@ tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규�
 이 저장소에는 규칙이 적은 것을 실제로 돌리는 실행기도 있다.
 
 - [`runtime/`](runtime)은 피드를 읽어 검사하고, 값을 계산하고, 조건을 판정하고, 컴패니언을 튼다. 컴패니언은 그림 몇 장과 경우표로 만든 것일 수도 있고, 직접 짠 그리기 코드일 수도 있다. 빌드 없이 쓰는 자바스크립트 모듈이고 다른 것에 기대지 않는다. Lottie 파일을 트는 것만 예외여서, `lottie-web` 꾸러미와 번들러가 있어야 한다.
-- [`examples/table/`](examples/table)은 경우표와 그림 몇 장으로 만든 컴패니언이다. 그리기 코드가 없다. [tidepic.com/examples/table/](https://tidepic.com/examples/table/)에서 돌고 있다. 주소 끝에 `?v=20&high=100&num=1`을 붙이면 숫자를 줄 수 있다.
+- [`examples/table/`](examples/table)은 경우표와 그림 몇 장으로 만든 컴패니언이다. 그리기 코드가 없다. [tidepic.com/examples/table/](https://tidepic.com/examples/table/)에서 돌고 있다. 주소 끝에 `?v=20&to=100&num=1`을 붙이면 숫자를 줄 수 있다.
 - 직접 만들려면 `examples/table/`을 복사해 그림을 바꾸고 `scenes.json`을 고친다. 정적 파일 서버 아무것으로나 그 폴더를 열면 된다.
 - `npm test`로 실행기의 테스트를 돌린다.
 

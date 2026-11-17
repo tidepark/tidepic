@@ -4,7 +4,7 @@ import { parseFeed, validateFeed } from "../src/validate.js";
 
 const sample = {
   spec: 1,
-  values: [{ value: 71200, low: 70100, high: 71900, base: 70500, momentum: 0.3 }],
+  values: [{ value: 71200, from: 70100, to: 71900, base: 70500, rate: 45, rateScale: 150 }],
   step: { now: 2, total: 4 },
   state: "live",
   event: { type: "score", index: 0, at: 1794787200 },
@@ -39,20 +39,22 @@ test("values 는 64개까지다. 넘으면 잘라 쓰지 않고 버린다", () =
 test("선택 항목이 틀리면 그 항목만 버린다. 고쳐 쓰지 않는다", () => {
   const result = validateFeed({
     spec: 1,
-    values: [{ value: 5, low: "0", high: 10, momentum: 1.5, scale: 0, better: "up" }],
+    values: [{ value: 5, from: "0", to: 10, rate: "fast", scale: 0, rateScale: -1, high: 10, momentum: 0.3 }],
     step: { now: "2" },
     ttl: -1,
   });
   assert.equal(result.ok, true);
-  assert.deepEqual(result.feed.values, [{ value: 5, high: 10 }]);
+  assert.deepEqual(result.feed.values, [{ value: 5, to: 10 }]);
   assert.equal(result.feed.step, undefined);
   assert.equal(result.feed.ttl, undefined);
   assert.deepEqual(result.dropped.sort(), [
     "step",
     "ttl",
-    "values[0].better",
-    "values[0].low",
+    "values[0].from",
+    "values[0].high",
     "values[0].momentum",
+    "values[0].rate",
+    "values[0].rateScale",
     "values[0].scale",
   ]);
 });

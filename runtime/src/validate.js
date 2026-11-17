@@ -82,23 +82,21 @@ export function validateFeed(data) {
 function cleanValue(v, i, dropped) {
   if (!isObject(v) || !isNum(v.value)) return null;
   const out = { value: v.value };
-  for (const key of ["low", "high", "base"]) {
+  // 원점과 숫자: 어떤 수든 된다.
+  for (const key of ["from", "to", "base", "rate"]) {
     if (v[key] === undefined) continue;
     if (isNum(v[key])) out[key] = v[key];
     else dropped.push(`values[${i}].${key}`);
   }
-  if (v.scale !== undefined) {
-    if (isNum(v.scale) && v.scale > 0) out.scale = v.scale;
-    else dropped.push(`values[${i}].scale`);
+  // 폭: 0 보다 커야 한다.
+  for (const key of ["scale", "rateScale"]) {
+    if (v[key] === undefined) continue;
+    if (isNum(v[key]) && v[key] > 0) out[key] = v[key];
+    else dropped.push(`values[${i}].${key}`);
   }
-  if (v.momentum !== undefined) {
-    if (isNum(v.momentum) && v.momentum >= -1 && v.momentum <= 1) {
-      out.momentum = v.momentum;
-    } else dropped.push(`values[${i}].momentum`);
-  }
-  if (v.better !== undefined) {
-    if (v.better === "high" || v.better === "low") out.better = v.better;
-    else dropped.push(`values[${i}].better`);
+  // 0.2 에서 없앤 이름. 읽지 않지만, 보낸 쪽이 알 수 있게 버린 목록에 넣는다.
+  for (const key of ["low", "high", "momentum", "better"]) {
+    if (v[key] !== undefined) dropped.push(`values[${i}].${key}`);
   }
   return out;
 }

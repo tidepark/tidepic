@@ -1,24 +1,34 @@
 // 계산되는 값 (규칙 3.2절). 컴패니언은 원래 숫자가 아니라 이 값으로 그린다.
-// 피드 한 장만으로 정한다. 지난 피드를 기억해 값을 만들지 않는다.
+// 모두 (숫자 − 원점) ÷ 폭 이다. 피드 한 장만으로 정한다. 지난 피드를 기억해 값을 만들지 않는다.
 
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 
 // total: 값들의 합. 몫을 낼 수 없으면 null 이다.
 export function computeValue(v, total = null) {
-  const low = v.low ?? 0;
-  const span = v.high === undefined ? undefined : v.high - low;
-  const fill = span > 0 ? clamp((v.value - low) / span, 0, 1) : null;
+  // 얼마나 왔는가: from 에서 to 로. to 가 from 보다 작아도 된다.
+  const from = v.from ?? 0;
+  const span = v.to === undefined ? 0 : v.to - from;
+  const along = span !== 0 ? (v.value - from) / span : null;
 
-  const scale = v.scale ?? span;
+  // 기준보다 얼마나: 폭은 scale, 없으면 범위의 크기다.
+  const scale = v.scale ?? Math.abs(span);
   const rise =
     v.base !== undefined && scale > 0
       ? clamp((v.value - v.base) / scale, -1, 1)
       : null;
 
+  // 어느 쪽으로 얼마나 빨리
+  const momentum =
+    v.rate !== undefined && v.rateScale > 0
+      ? clamp(v.rate / v.rateScale, -1, 1)
+      : null;
+
   return {
-    fill,
+    fill: along === null ? null : clamp(along, 0, 1),
+    over: along === null ? null : clamp(along - 1, 0, 1), // to 를 넘은 만큼
+    under: along === null ? null : clamp(-along, 0, 1), // from 에 못 미친 만큼
     rise,
-    momentum: v.momentum ?? 0,
+    momentum,
     share: total === null ? null : v.value / total,
     raw: v,
   };

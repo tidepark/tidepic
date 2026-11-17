@@ -20,15 +20,16 @@ function midnight(text) {
   return new Date(y, mo - 1, d);
 }
 
-// 남은 날을 세는 피드. 규칙 3.1절대로 value 가 남은 날, high 가 전체 날이다.
-// since(시작한 날)가 없으면 high 가 없다. 그날이 지나면 0 이고 끝남(done)이다.
+// 남은 날을 세는 피드. value 가 남은 날이고, 전체 날(from)에서 0(to)으로 간다.
+// 그래서 채움은 그날에 다가온 만큼이다. since(시작한 날)가 없으면 범위가 없다.
+// 그날이 지나면 0 이고 끝남(done)이다.
 export function dateFeed({ until, since }, today = new Date()) {
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const left = Math.round((midnight(until) - start) / DAY_MS);
   const value = { value: Math.max(0, left) };
   if (since) {
     const total = Math.round((midnight(until) - midnight(since)) / DAY_MS);
-    if (total > 0) value.high = total;
+    if (total > 0) Object.assign(value, { from: total, to: 0 });
   }
   return { spec: 1, values: [value], state: left < 0 ? "done" : "live" };
 }

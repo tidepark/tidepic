@@ -41,12 +41,14 @@ export function randomFeed({ seed, count = 1, time = 0 }) {
       x += wave.amp * Math.sin(w * time + phase);
       dx += wave.amp * w * Math.cos(w * time + phase);
     }
+    // 값은 50 + 45x 이므로 변화율은 45dx 다. 전과 같은 기울기가 나오게 폭을 잡았다.
     values.push({
       value: Math.round((50 + 45 * x) * 10) / 10,
-      low: 0,
-      high: 100,
+      from: 0,
+      to: 100,
       base: 50,
-      momentum: Math.round(Math.min(1, Math.max(-1, dx * 8)) * 100) / 100,
+      rate: Math.round(45 * dx * 100) / 100,
+      rateScale: 5.6,
     });
   }
   return { spec: 1, values, state: "live" };

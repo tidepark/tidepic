@@ -30,9 +30,9 @@ test("그날은 0 이고, 지나면 0 인 채로 끝남이 된다", () => {
   assert.deepEqual(feed(at(2026, 12, 26)), { spec: 1, values: [{ value: 0 }], state: "done" });
 });
 
-test("시작한 날을 주면 전체 날이 high 가 된다", () => {
+test("시작한 날을 주면 전체 날에서 0 으로 가는 범위가 된다", () => {
   const feed = dateFeed({ until: "2026-12-25", since: "2026-11-15" }, at(2026, 11, 16));
-  assert.deepEqual(feed.values, [{ value: 39, high: 40 }]);
+  assert.deepEqual(feed.values, [{ value: 39, from: 40, to: 0 }]);
   const backwards = dateFeed({ until: "2026-12-25", since: "2027-01-01" }, at(2026, 11, 16));
   assert.deepEqual(backwards.values, [{ value: 39 }]);
 });

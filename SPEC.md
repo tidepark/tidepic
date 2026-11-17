@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.1.8 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.0 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -34,7 +34,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
 {
   "spec": 1,
   "values": [
-    { "value": 71200, "low": 70100, "high": 71900, "base": 70500, "momentum": 0.3 }
+    { "value": 71200, "from": 70100, "to": 71900, "base": 70500, "rate": 45, "rateScale": 150 }
   ],
   "step":  { "now": 2, "total": 4 },
   "state": "live",
@@ -64,34 +64,38 @@ The number of values decides the kind of scene.
 | 2 | Versus | A game score 92:102, income vs. spending, today vs. yesterday |
 | Many | A group | A portfolio, a ranking, seven days of a habit |
 
-Each value is an object. Only `value` is required.
+Each value is an object. Only `value` is required. The other fields are what the number is read against.
 
 | Field | Meaning | Example (steps) | Example (price) |
 |---|---|---|---|
 | `value` | The current number | 6200 | 71200 |
-| `low` | Lower end. Defaults to 0 | 0 | Day low |
-| `high` | Upper end | Goal 10000 | Day high |
-| `base` | Reference point for rise and fall | Yesterday's steps | Previous close |
-| `scale` | Typical size of a move from `base` | — | Usual daily range |
-| `momentum` | Speed of change, −1 to 1 | — | Slope of a moving average |
-| `better` | Which direction is good: `"high"` or `"low"`. Defaults to `"high"` | `"high"` | `"high"` |
+| `from` | Where the range starts. Defaults to 0 | 0 | Day low |
+| `to` | Where the range ends | Goal 10000 | Day high |
+| `base` | Reference point for rise and fall | Steps at this hour yesterday | Previous close |
+| `scale` | How large a move from `base` counts as 1 | — | Usual daily range |
+| `rate` | How fast the number is changing, in its own units per unit of time | Steps per hour | Change per minute |
+| `rateScale` | How large a `rate` counts as 1, in the same units | — | Usual change per minute |
 
-For a countdown, send what remains: `value` is days left and `high` is total days. The fill shrinks as the day approaches.
+- The range has a direction. It runs from `from` to `to`, and `to` may be the smaller number. A weight going from 78 down to 70 is `"from": 78, "to": 70`.
+- For a countdown, `value` is the days left, `from` is the total days and `to` is 0. The fill grows as the day approaches.
 
 ### 3.2 Derived values
 
-A companion draws from these, not from the raw numbers.
+A companion draws from these, not from the raw numbers. Each one is (a number − an origin) ÷ a span. The sender sends the raw numbers and the runtime does the dividing.
 
 | Name | Range | How | Needs |
 |---|---|---|---|
-| `fill` | 0 to 1 | (`value` − `low`) ÷ (`high` − `low`) | `high` |
-| `rise` | −1 to 1 | (`value` − `base`) ÷ scale | `base` |
-| `momentum` | −1 to 1 | As sent. 0 if missing | — |
+| `fill` | 0 to 1 | (`value` − `from`) ÷ (`to` − `from`) | `to` |
+| `over` | 0 to 1 | How far past `to`, counted in ranges. 0 inside the range | `to` |
+| `under` | 0 to 1 | How far short of `from`, counted in ranges. 0 inside the range | `to` |
+| `rise` | −1 to 1 | (`value` − `base`) ÷ `scale` | `base`, and `scale` or a range |
+| `momentum` | −1 to 1 | `rate` ÷ `rateScale` | `rate` and `rateScale` |
 | `share` | 0 to 1 | `value` ÷ sum of all values | — |
 
-- The scale for `rise` is `scale` if sent, otherwise `high` − `low`. Results are clamped to −1…1. This rule is provisional (see section 13).
-- Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the slope (`momentum`).
-- A missing `low` counts as 0. Without `high` there is no `fill`, and without `base` there is no `rise`.
+- `fill` is clamped to 0…1. What falls outside goes to `over` and `under`. 132 against a goal of 100 gives `fill` 1 and `over` 0.32.
+- The span for `rise` is `scale` if sent, otherwise the size of the range (`to` − `from`). Results are clamped to −1…1. This rule is provisional (see section 13).
+- Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the rate of change (`rate`). The unit of time is the sender's choice, as long as `rate` and `rateScale` use the same one.
+- A missing `from` counts as 0. When the numbers a value needs are missing, the value is absent: no `fill` without `to`, no `rise` without `base` or a span, no `momentum` without `rate` or `rateScale`. Section 9 says when the runtime gives notice.
 - `share` is for comparing numbers that have no upper end, such as scores. 1 against 10 gives 0.09 and 0.91. If any value is negative or the sum is 0, there is no `share`.
 - The runtime may ease the scene into place when a new value arrives. It does not change the value it arrives at. A still image always shows the arrived value.
 
@@ -146,13 +150,16 @@ The runtime also turns the derived values into named conditions. Every companion
 | Condition | Names | Worked out from |
 |---|---|---|
 | `level` | `empty`, `low`, `mid`, `high`, `full` | `fill`: below 0.05, below 0.35, below 0.65, below 0.95, and the rest |
+| `bound` | `under`, `inside`, `over` | Whether `value` is short of `from`, inside the range, or past `to` |
 | `trend` | `fall`, `flat`, `rise` | `rise`: below −0.1, in between, above 0.1 |
+| `drift` | `down`, `still`, `up` | `momentum`: below −0.1, in between, above 0.1 |
 | `pace` | `calm`, `brisk` | Size of `momentum`: below 0.3, or not |
 | `lead` | `first`, `tie`, `second` | With two values, which one is ahead |
 | `state` | `live`, `idle`, `done`, `stale` | Section 3.4. `stale` is set by the runtime |
 
 - Conditions are worked out for each value.
-- A condition that cannot be worked out is simply absent. Without `base` there is no `trend`.
+- A condition that cannot be worked out is absent. Without `base` there is no `trend`, and without `rate` there is no `drift` or `pace`.
+- `level` stays `full` when the value passes `to`. `bound` tells the two apart.
 - **No flicker at the edges.** Once a condition changes, the value must move a further 0.03 past the boundary before it changes back.
 - **Conditions pick the scene; derived values fine-tune it.** The derived values stay available for speed and amount, so 62% and 68% need not look identical.
 - The boundaries above are provisional (section 13).
@@ -175,13 +182,14 @@ A companion gets its feed from one of four sources. All produce the same format.
 | Source | Setting | Notes |
 |---|---|---|
 | Random | `data=random` (default) | Generated inside the page, no network. Moves smoothly. The same `seed` gives the same sequence |
-| Inline | `v=62&high=100` | Values written directly in the address. Several values: `v=92,102` |
+| Inline | `v=62&to=100` | Values written directly in the address. Several values: `v=92,102` |
 | Date | `until=2026-12-25` | The page counts the days left until that date. No network |
 | URL | `data=<url>` | The page fetches a feed from that address |
 
 - Random is a source, not a special mode. Every companion therefore runs with no setup.
-- The date source gives the days left as `value` (3.1). On the day itself it is 0. After that it stays 0 and `state` becomes `"done"`. Add the starting day as `since=2026-11-01` and the total number of days becomes `high`. Dates are written `YYYY-MM-DD`, and the day changes in the viewer's own time zone.
-- Inline values take the numeric fields of `values` (`low`, `high`, `base`, `scale`, `momentum`) under the same names. Example: `v=102&base=100&scale=5&momentum=0.4`. A single number applies to every value. Write `high=110,120` when they differ. `better` cannot be written in the address.
+- The date source gives the days left as `value` (3.1). On the day itself it is 0. After that it stays 0 and `state` becomes `"done"`. Add the starting day as `since=2026-11-01` and the range runs from the total number of days to 0. Dates are written `YYYY-MM-DD`, and the day changes in the viewer's own time zone.
+- Inline values take the numeric fields of `values` (`from`, `to`, `base`, `scale`, `rate`, `rateScale`) under the same names. Example: `v=102&base=100&scale=5&rate=0.8&rateScale=2`. A single number applies to every value. Write `to=110,120` when they differ.
+- Addresses written before 0.2 used `low`, `high` and `momentum`. The address still reads them for now: `low` as `from`, `high` as `to`, and `momentum` as a `rate` with a `rateScale` of 1. A feed does not.
 - If more than one is given, `data` wins over `v`, and `v` over `until`.
 - A URL source must allow cross-origin requests (CORS).
 - A site or host may restrict which feed URLs it accepts.
@@ -238,7 +246,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | `titleAt` | Where the title goes (see below). Default `tl` | yes |
 | `num` | `1` shows the number. Default `0` | yes |
 | `numAt` | Where the number goes. Default `br` | yes |
-| `v`, `low`, `high`, `base`, `scale`, `momentum` | Inline values (4) | yes |
+| `v`, `from`, `to`, `base`, `scale`, `rate`, `rateScale` | Inline values (4) | yes |
 | `until`, `since` | The date to count down to, and the day counting started | yes |
 | `assets` | Where skin images are loaded from | no — config file only |
 
@@ -292,7 +300,7 @@ bl  bc  br
 | `grade` | `"basic"` or `"free"` (section 8) |
 | `still` | Whether it can produce a still image |
 | `reads.values` | How many values it reads: `1`, `2` or `"many"` |
-| `reads.needs` | Derived values it cannot do without: `"fill"`, `"rise"`, `"share"` |
+| `reads.needs` | Derived values it cannot do without: `"fill"`, `"rise"`, `"momentum"`, `"share"` |
 | `reads.step` | Whether it uses `step` |
 | `reads.events` | Event types it reacts to |
 | `reads.extra` | `extra` domains it reads |
@@ -335,9 +343,9 @@ For a companion made as a table. The skin says what to show in each case.
 - Every condition in `when` must hold. A list means "any of these".
 - The last entry has no `when`. It is the default, and it is required.
 - `show` is an image, a video, or a Lottie file (`.json`). Videos and Lottie files play muted and loop, and need a `poster` image for still frames.
-- On a Lottie line, `follow` stops the loop and holds the animation at the position of a derived value. For `"fill"` and `"share"`, 0 is the start and 1 is the end. For `"rise"` and `"momentum"`, -1 is the start, 0 is the middle, and 1 is the end. Example: `{ "show": "sun.json", "poster": "sun.webp", "follow": "fill" }`
+- On a Lottie line, `follow` stops the loop and holds the animation at the position of a derived value. For `"fill"`, `"over"`, `"under"` and `"share"`, 0 is the start and 1 is the end. For `"rise"` and `"momentum"`, -1 is the start, 0 is the middle, and 1 is the end. Example: `{ "show": "sun.json", "poster": "sun.webp", "follow": "fill" }`
 - A Lottie file carries its images inside the file and uses no fonts and no expressions. The runtime does not run expressions (provisional).
-- `effects` adds moving pieces drawn by the runtime. `amount` is a number from 0 to 1, or the name of a derived value (`"fill"`, `"rise"`, `"momentum"`, `"share"`) to follow it continuously.
+- `effects` adds moving pieces drawn by the runtime. `amount` is a number from 0 to 1, or the name of a derived value (`"fill"`, `"over"`, `"under"`, `"rise"`, `"momentum"`, `"share"`) to follow it continuously.
 - `events` plays something once, on top, when an event of that type arrives.
 - `fade` is the cross-fade in seconds when the scene changes. The default is 1.
 
@@ -383,7 +391,7 @@ A companion made as a case table has no drawing code; the runtime shows its scen
 
 ```js
 draw(ctx, {
-  values,   // [{ fill, rise, momentum, share, raw }]
+  values,   // [{ fill, over, under, rise, momentum, share, raw }]
   step, state, event, extra,
   skin,     // images and layout numbers
   width, height,
@@ -398,8 +406,10 @@ The runtime compares what a companion declares with what actually arrives.
 
 | Situation | What happens |
 |---|---|
-| `momentum` or `low` is missing | Counts as 0. No notice |
-| A needed value cannot be computed (no `high` but `fill` is needed, or no `base` but `rise` is needed) | Warning |
+| `from` is missing | Counts as 0. No notice |
+| A number has nothing to be divided by (`base` without `scale` or a range, `rate` without `rateScale`) | Warning. That value is absent |
+| A feed uses a field name from before 0.2 (`low`, `high`, `momentum`, `better`) | Not read. Listed among the dropped fields |
+| A needed value cannot be computed (no `to` but `fill` is needed, or no `base` but `rise` is needed) | Warning |
 | The count differs (reads 2, got 1) | Warning |
 | A case uses a condition that cannot be worked out (`trend` without `base`) | Warning. That case never matches |
 | `extra` did not arrive | Draws from common fields and notes "showing default behavior" |
@@ -445,7 +455,6 @@ A warning never blanks the screen. The companion draws what it can.
 ## 13. Open questions
 
 - The scale for `rise`. Values with very different volatility should still read as the same slope.
-- Whether `better` stays.
 - The boundaries of the conditions in section 3.7, and whether a viewer may adjust the `flat` range.
 - How a case table handles many values.
 - The time zone of the date source. It is the viewer's for now, but a server that renders still images may be in another one.

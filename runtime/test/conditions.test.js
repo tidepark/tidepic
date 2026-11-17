@@ -10,7 +10,7 @@ const judge = (values, options) => {
 const one = (v) => judge([v]).values[0];
 
 test("level 은 fill 의 높이다", () => {
-  const level = (fill) => one({ value: fill, high: 1 }).level;
+  const level = (fill) => one({ value: fill, to: 1 }).level;
   assert.equal(level(0.04), "empty");
   assert.equal(level(0.05), "low");
   assert.equal(level(0.34), "low");
@@ -31,18 +31,32 @@ test("trend 는 rise 의 방향이다", () => {
   assert.equal(trend(0.11), "rise");
 });
 
-test("pace 는 momentum 의 크기다", () => {
-  const pace = (momentum) => one({ value: 1, momentum }).pace;
-  assert.equal(pace(0), "calm");
-  assert.equal(pace(0.29), "calm");
-  assert.equal(pace(0.3), "brisk");
-  assert.equal(pace(-0.8), "brisk");
-  assert.equal(one({ value: 1 }).pace, "calm");
+test("pace 는 momentum 의 크기이고, drift 는 그 방향이다", () => {
+  const of = (rate) => one({ value: 1, rate, rateScale: 1 });
+  assert.equal(of(0).pace, "calm");
+  assert.equal(of(0.29).pace, "calm");
+  assert.equal(of(0.3).pace, "brisk");
+  assert.equal(of(-0.8).pace, "brisk");
+  assert.equal(of(-0.11).drift, "down");
+  assert.equal(of(-0.1).drift, "still");
+  assert.equal(of(0.1).drift, "still");
+  assert.equal(of(0.11).drift, "up");
+});
+
+test("bound 는 범위 밖인지를 말한다", () => {
+  const bound = (value) => one({ value, to: 100 }).bound;
+  assert.equal(bound(50), "inside");
+  assert.equal(bound(100), "inside");
+  assert.equal(bound(132), "over");
+  assert.equal(bound(-5), "under");
+  assert.equal(one({ value: 132, to: 100 }).level, "full"); // level 은 그대로다
+  assert.equal(one({ value: 68, from: 78, to: 70 }).bound, "over"); // 줄어드는 범위
 });
 
 test("판정할 수 없는 조건은 없다", () => {
-  assert.deepEqual(one({ value: 5 }), { pace: "calm" });
-  assert.deepEqual(one({ value: 5, high: 10 }), { level: "mid", pace: "calm" });
+  assert.deepEqual(one({ value: 5 }), {});
+  assert.deepEqual(one({ value: 5, to: 10 }), { level: "mid", bound: "inside" });
+  assert.deepEqual(one({ value: 5, rate: 1 }), {}); // 폭이 없다
 });
 
 test("lead 는 값이 2개일 때만 있다", () => {
@@ -61,7 +75,7 @@ test("state 는 피드의 것이고, 끊기면 stale 이다", () => {
 test("경계에서 깜빡이지 않는다: 바뀐 뒤에는 0.03 을 더 넘어가야 되돌아간다", () => {
   let memory;
   const level = (fill) => {
-    const judged = judge([{ value: fill, high: 1 }], { memory });
+    const judged = judge([{ value: fill, to: 1 }], { memory });
     memory = judged.memory;
     return judged.values[0].level;
   };
@@ -77,19 +91,21 @@ test("경계에서 깜빡이지 않는다: 바뀐 뒤에는 0.03 을 더 넘어�
 });
 
 test("앞의 상태가 없으면(정지 그림) 값만으로 판정한다", () => {
-  assert.equal(one({ value: 0.34, high: 1 }).level, "low");
-  assert.equal(one({ value: 0.36, high: 1 }).level, "mid");
+  assert.equal(one({ value: 0.34, to: 1 }).level, "low");
+  assert.equal(one({ value: 0.36, to: 1 }).level, "mid");
 });
 
 test("경우표는 첫째 값의 조건과 lead, state 를 본다", () => {
   const judged = judge([
-    { value: 9, high: 10, base: 5 },
-    { value: 1, high: 10 },
+    { value: 9, to: 10, base: 5, rate: 0.5, rateScale: 1 },
+    { value: 1, to: 10 },
   ]);
   assert.deepEqual(sceneConditions(judged), {
     level: "high",
+    bound: "inside",
     trend: "rise",
-    pace: "calm",
+    drift: "up",
+    pace: "brisk",
     state: "live",
     lead: "first",
   });

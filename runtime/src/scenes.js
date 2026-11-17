@@ -8,7 +8,7 @@ const LOTTIE = /^[a-z0-9][a-z0-9._-]*\.json$/;
 const RESERVED = ["scenes.json", "skin.json"];
 const WORD = /^[a-z]+$/;
 const EFFECTS = ["drift", "fall", "float", "count"];
-const AMOUNTS = ["fill", "rise", "momentum", "share"];
+const AMOUNTS = ["fill", "over", "under", "rise", "momentum", "share"];
 const MAX_SCENES = 64;
 const MAX_EFFECTS = 8;
 

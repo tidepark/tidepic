@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.0 — 2026-11-17
+
+The fields of a value changed. Feeds written for 0.1 need to be rewritten. Every derived value is now (a number − an origin) ÷ a span.
+
+- `low` and `high` became `from` and `to`. The range has a direction, and `to` may be the smaller number. `fill` is how far the value has come from `from` to `to` (3.1, 3.2).
+- A countdown now runs from the total days to 0, so its fill grows as the day approaches. It used to shrink (3.1, 4).
+- New derived values `over` and `under`, and a new condition `bound`, for a value outside its range (3.2, 3.7).
+- `momentum` is no longer sent. The sender sends `rate` and `rateScale` and the runtime divides. Without them there is no `momentum` and no `pace`. New condition `drift` for its direction (3.1, 3.2, 3.7).
+- `better` is gone. Nothing read it.
+- The runtime gives notice when a number has nothing to be divided by, instead of leaving the value out silently (9).
+- The address still reads `low`, `high` and `momentum` for now. A feed does not (4).
+
+값의 항목이 바뀌었다. 0.1 에 맞춰 쓴 피드는 다시 써야 한다. 계산된 값은 이제 모두 (숫자 − 원점) ÷ 폭이다.
+
+- `low`, `high`가 `from`, `to`가 되었다. 범위에 방향이 있고 `to`가 더 작은 수여도 된다. `fill`은 `from`에서 `to`로 온 만큼이다(3.1절, 3.2절).
+- 남은 날을 셀 때는 전체 날에서 0 으로 간다. 그래서 날이 다가올수록 채움이 늘어난다. 전에는 줄어들었다(3.1절, 4절).
+- 범위 밖의 값을 위해 계산된 값 `over`, `under`와 조건 `bound`를 더했다(3.2절, 3.7절).
+- `momentum`을 보내지 않는다. 보내는 쪽은 `rate`와 `rateScale`을 보내고 런타임이 나눈다. 둘이 없으면 `momentum`과 `pace`가 없다. 그 방향을 보는 조건 `drift`를 더했다(3.1절, 3.2절, 3.7절).
+- `better`를 없앴다. 읽는 곳이 없었다.
+- 숫자를 나눌 폭이 없으면 조용히 빼지 않고 알린다(9절).
+- 주소에서는 `low`, `high`, `momentum`을 한동안 그대로 읽는다. 피드에서는 읽지 않는다(4절).
+
 ## 0.1.8 — 2026-11-17
 
 - Wording only. Section 14 now says what tidepic covers instead of comparing it with earlier work. Removed "any number" (14) and "far more" (7). No rule changed.

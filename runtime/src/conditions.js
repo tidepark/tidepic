@@ -12,8 +12,19 @@ const BANDS = {
     bounds: [0.05, 0.35, 0.65, 0.95],
     index: (x) => count([0.05, 0.35, 0.65, 0.95], x),
   },
+  // 범위 밖인가. 보는 숫자는 fill 에 넘친 만큼을 더하고 못 미친 만큼을 뺀 것이다.
+  bound: {
+    names: ["under", "inside", "over"],
+    bounds: [0, 1],
+    index: (x) => (x < 0 ? 0 : x > 1 ? 2 : 1),
+  },
   trend: {
     names: ["fall", "flat", "rise"],
+    bounds: [-0.1, 0.1],
+    index: (x) => (x < -0.1 ? 0 : x > 0.1 ? 2 : 1),
+  },
+  drift: {
+    names: ["down", "still", "up"],
     bounds: [-0.1, 0.1],
     index: (x) => (x < -0.1 ? 0 : x > 0.1 ? 2 : 1),
   },
@@ -26,7 +37,9 @@ const BANDS = {
 
 export const CONDITION_NAMES = {
   level: BANDS.level.names,
+  bound: BANDS.bound.names,
   trend: BANDS.trend.names,
+  drift: BANDS.drift.names,
   pace: BANDS.pace.names,
   lead: ["first", "tie", "second"],
   state: ["live", "idle", "done", "stale"],
@@ -47,9 +60,15 @@ function settle(band, value, prev) {
 
 function judgeValue(c, prev = {}) {
   const memory = {};
-  if (c.fill !== null) memory.level = settle(BANDS.level, c.fill, prev.level);
+  if (c.fill !== null) {
+    memory.level = settle(BANDS.level, c.fill, prev.level);
+    memory.bound = settle(BANDS.bound, c.fill + c.over - c.under, prev.bound);
+  }
   if (c.rise !== null) memory.trend = settle(BANDS.trend, c.rise, prev.trend);
-  memory.pace = settle(BANDS.pace, Math.abs(c.momentum), prev.pace);
+  if (c.momentum !== null) {
+    memory.drift = settle(BANDS.drift, c.momentum, prev.drift);
+    memory.pace = settle(BANDS.pace, Math.abs(c.momentum), prev.pace);
+  }
   return memory;
 }
 

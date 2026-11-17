@@ -8,7 +8,7 @@ import { judgeFeed, sceneConditions } from "./conditions.js";
 import { checkLottie, loadLottie } from "./lottie.js";
 import { isLottie, isVideo, readScenes, tableFiles, unjudged } from "./scenes.js";
 import { createStage } from "./stage.js";
-import { checkReads } from "./check.js";
+import { checkFeed, checkReads } from "./check.js";
 import { drawOverlay, numberText } from "./overlay.js";
 
 export { validateFeed, parseFeed, LIMITS } from "./validate.js";
@@ -18,7 +18,7 @@ export { readScenes, pickScene } from "./scenes.js";
 export { randomFeed } from "./random.js";
 export { dateFeed, parseDay } from "./dates.js";
 export { readConfig, POSITIONS } from "./config.js";
-export { checkReads } from "./check.js";
+export { checkFeed, checkReads } from "./check.js";
 export { drawOverlay, numberText, formatNumber } from "./overlay.js";
 
 const FRAME_MS = 1000 / 30; // 초당 30장을 넘지 않는다 (규칙 10절)
@@ -213,7 +213,7 @@ export async function start({
       }
       target = computeFeed(feed);
       judged = judgeFeed(feed, target, { memory: judged?.memory });
-      for (const n of checkReads(reads, feed, target)) {
+      for (const n of [...checkFeed(feed), ...checkReads(reads, feed, target)]) {
         notify(n.level, n.code, n.message);
       }
       if (byTable) {
@@ -250,7 +250,7 @@ export async function start({
     }
     shown = target.map((t, i) => {
       const out = { raw: t.raw };
-      for (const name of ["fill", "rise", "momentum", "share"]) {
+      for (const name of ["fill", "over", "under", "rise", "momentum", "share"]) {
         const from = shown[i][name];
         out[name] =
           t[name] === null || from === null || from === undefined

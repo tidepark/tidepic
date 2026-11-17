@@ -5,37 +5,56 @@ import { computeFeed, computeValue } from "../src/compute.js";
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} ≠ ${b}`);
 const feedOf = (...values) => ({ values: values.map((value) => ({ value })) });
 
-test("fill 은 (value − low) ÷ (high − low) 이고, low 가 없으면 0 이다", () => {
-  near(computeValue({ value: 6200, high: 10000 }).fill, 0.62);
-  near(computeValue({ value: 71200, low: 70100, high: 71900 }).fill, 1100 / 1800);
+test("fill 은 (value − from) ÷ (to − from) 이고, from 이 없으면 0 이다", () => {
+  near(computeValue({ value: 6200, to: 10000 }).fill, 0.62);
+  near(computeValue({ value: 71200, from: 70100, to: 71900 }).fill, 1100 / 1800);
 });
 
-test("fill 은 0~1 로 자른다", () => {
-  assert.equal(computeValue({ value: 120, high: 100 }).fill, 1);
-  assert.equal(computeValue({ value: -5, high: 100 }).fill, 0);
+test("to 가 from 보다 작아도 된다. fill 은 from 에서 to 로 온 만큼이다", () => {
+  near(computeValue({ value: 72, from: 78, to: 70 }).fill, 0.75); // 감량
+  near(computeValue({ value: 3, from: 30, to: 0 }).fill, 0.9); // 남은 날
 });
 
-test("high 가 없으면 fill 은 없다", () => {
+test("fill 은 0~1 로 자르고, 범위 밖은 over 와 under 로 낸다", () => {
+  const past = computeValue({ value: 132, to: 100 });
+  assert.equal(past.fill, 1);
+  near(past.over, 0.32);
+  assert.equal(past.under, 0);
+  const short = computeValue({ value: -5, to: 100 });
+  assert.equal(short.fill, 0);
+  near(short.under, 0.05);
+  assert.equal(short.over, 0);
+  assert.equal(computeValue({ value: 900, to: 100 }).over, 1);
+  // 줄어드는 범위에서도 to 를 지나면 over 다
+  near(computeValue({ value: 68, from: 78, to: 70 }).over, 0.25);
+});
+
+test("to 가 없거나 from 과 같으면 fill, over, under 는 없다", () => {
   assert.equal(computeValue({ value: 5 }).fill, null);
-  assert.equal(computeValue({ value: 5, low: 1 }).fill, null);
-  assert.equal(computeValue({ value: 5, low: 10, high: 10 }).fill, null);
+  assert.equal(computeValue({ value: 5, from: 1 }).fill, null);
+  const flat = computeValue({ value: 5, from: 10, to: 10 });
+  assert.deepEqual([flat.fill, flat.over, flat.under], [null, null, null]);
 });
 
-test("rise 는 (value − base) ÷ 축척이다. 축척은 scale, 없으면 high − low", () => {
+test("rise 는 (value − base) ÷ 폭이다. 폭은 scale, 없으면 범위의 크기", () => {
   near(computeValue({ value: 110, base: 100, scale: 40 }).rise, 0.25);
-  near(computeValue({ value: 71200, low: 70100, high: 71900, base: 70500 }).rise, 700 / 1800);
+  near(computeValue({ value: 71200, from: 70100, to: 71900, base: 70500 }).rise, 700 / 1800);
+  near(computeValue({ value: 72, from: 78, to: 70, base: 74 }).rise, -0.25);
   assert.equal(computeValue({ value: 500, base: 100, scale: 40 }).rise, 1);
   assert.equal(computeValue({ value: -500, base: 100, scale: 40 }).rise, -1);
 });
 
-test("base 가 없으면 rise 도 없다", () => {
-  assert.equal(computeValue({ value: 5, high: 10 }).rise, null);
+test("base 나 폭이 없으면 rise 는 없다", () => {
+  assert.equal(computeValue({ value: 5, to: 10 }).rise, null);
   assert.equal(computeValue({ value: 5, base: 3 }).rise, null);
 });
 
-test("momentum 은 보낸 값만 쓴다. 없으면 0 이다", () => {
-  assert.equal(computeValue({ value: 5, high: 10, momentum: -0.4 }).momentum, -0.4);
-  assert.equal(computeValue({ value: 5, high: 10 }).momentum, 0);
+test("momentum 은 rate ÷ rateScale 이고 −1~1 로 자른다. 둘 중 하나가 없으면 없다", () => {
+  near(computeValue({ value: 5, rate: -0.8, rateScale: 2 }).momentum, -0.4);
+  assert.equal(computeValue({ value: 5, rate: 9, rateScale: 2 }).momentum, 1);
+  assert.equal(computeValue({ value: 5, rate: 0, rateScale: 2 }).momentum, 0);
+  assert.equal(computeValue({ value: 5, rate: 0.3 }).momentum, null);
+  assert.equal(computeValue({ value: 5, to: 10 }).momentum, null);
 });
 
 test("share 는 그 값 ÷ 값들의 합이다", () => {
@@ -54,12 +73,12 @@ test("음수가 섞이거나 합이 0 이면 share 는 없다", () => {
 });
 
 test("같은 피드는 몇 번을 계산해도 같은 값을 낸다", () => {
-  const feed = { values: [{ value: 6200, high: 10000, base: 5400 }, { value: 100, high: 400 }] };
+  const feed = { values: [{ value: 6200, to: 10000, base: 5400 }, { value: 100, to: 400 }] };
   const first = computeFeed(feed);
   for (let i = 0; i < 5; i++) assert.deepEqual(computeFeed(feed), first);
 });
 
 test("원래 값은 raw 로 그대로 넘긴다", () => {
-  const v = { value: 5, high: 10, better: "low" };
+  const v = { value: 5, to: 10 };
   assert.equal(computeValue(v).raw, v);
 });

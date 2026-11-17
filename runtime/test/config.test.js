@@ -40,25 +40,39 @@ test("assets 와 dataOrigins 는 주소 인자로 바꿀 수 없다", () => {
 });
 
 test("v 를 적으면 주소에 직접 적은 값을 쓴다", () => {
-  assert.deepEqual(readConfig({}, "?v=62&high=100", BASE).source, {
+  assert.deepEqual(readConfig({}, "?v=62&to=100", BASE).source, {
     kind: "inline",
-    values: [{ value: 62, high: 100 }],
+    values: [{ value: 62, to: 100 }],
   });
-  assert.deepEqual(readConfig({}, "?v=92,102&low=0&high=110,120", BASE).source, {
+  assert.deepEqual(readConfig({}, "?v=92,102&from=0&to=110,120", BASE).source, {
     kind: "inline",
     values: [
-      { value: 92, low: 0, high: 110 },
-      { value: 102, low: 0, high: 120 },
+      { value: 92, from: 0, to: 110 },
+      { value: 102, from: 0, to: 120 },
     ],
   });
   assert.deepEqual(
-    readConfig({}, "?v=102&base=100&scale=5&momentum=-0.4", BASE).source,
+    readConfig({}, "?v=102&base=100&scale=5&rate=-0.8&rateScale=2", BASE).source,
     {
       kind: "inline",
-      values: [{ value: 102, base: 100, scale: 5, momentum: -0.4 }],
+      values: [{ value: 102, base: 100, scale: 5, rate: -0.8, rateScale: 2 }],
     },
   );
   assert.deepEqual(readConfig({}, "?v=1,,3", BASE).source, { kind: "random" });
+});
+
+test("주소에서는 0.2 전의 이름(low, high, momentum)도 받아 새 이름으로 바꾼다", () => {
+  assert.deepEqual(readConfig({}, "?v=62&low=10&high=100", BASE).source.values, [
+    { value: 62, from: 10, to: 100 },
+  ]);
+  // 옛 momentum 은 이미 −1~1 이므로 폭을 1 로 둔다
+  assert.deepEqual(readConfig({}, "?v=100&momentum=0.7", BASE).source.values, [
+    { value: 100, rate: 0.7, rateScale: 1 },
+  ]);
+  // 새 이름을 같이 적으면 새 이름이 앞선다
+  assert.deepEqual(readConfig({}, "?v=5&high=10&to=20", BASE).source.values, [
+    { value: 5, to: 20 },
+  ]);
   assert.deepEqual(readConfig({}, "?v=abc", BASE).source, { kind: "random" });
 });
 
