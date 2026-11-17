@@ -1,17 +1,21 @@
 // 피드 검사 (규칙 3절, 11절). 맞는 것만 새 객체로 옮겨 담아 돌려준다.
 // 필수 항목이 틀리면 피드 전체를 버리고, 선택 항목이 틀리면 그 항목만 버린다. 고쳐 쓰지 않는다.
 
+import { POSITIONS } from "./config.js";
+
 export const LIMITS = {
   feedBytes: 16 * 1024,
   values: 64,
   extraBytes: 4 * 1024,
   text: 64,
   unit: 8,
+  title: 40,
 };
 
 const STATES = ["live", "idle", "done"];
 const FORMATS = ["number", "duration"];
 const CONTROL = /[\u0000-\u001f\u007f]/;
+const SLUG = /^[a-z0-9-]{1,64}$/;
 const WORD = /^[a-z]+$/;
 const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
@@ -90,6 +94,10 @@ export function validateFeed(data) {
     const extra = cleanExtra(data.extra, dropped);
     if (extra) feed.extra = extra;
   }
+  if (data.view !== undefined) {
+    const view = cleanView(data.view, dropped);
+    if (view) feed.view = view;
+  }
   if (data.meta !== undefined) {
     const meta = cleanMeta(data.meta, dropped);
     if (meta) feed.meta = meta;
@@ -139,6 +147,29 @@ function cleanStep(step) {
     out.to = step.to;
   }
   return out;
+}
+
+// 보내는 쪽이 고르는 표시. 설정과 같은 이름을 쓰고, 꾸러미에 이미 있는 것 가운데서 고르기만 한다.
+const VIEW = {
+  skin: (x) => typeof x === "string" && SLUG.test(x),
+  title: (x) => isText(x, LIMITS.title),
+  titleAt: (x) => POSITIONS.includes(x),
+  num: (x) => typeof x === "boolean",
+  numAt: (x) => POSITIONS.includes(x),
+};
+
+function cleanView(view, dropped) {
+  if (!isObject(view)) {
+    dropped.push("view");
+    return null;
+  }
+  const out = {};
+  for (const [key, ok] of Object.entries(VIEW)) {
+    if (view[key] === undefined) continue;
+    if (ok(view[key])) out[key] = view[key];
+    else dropped.push(`view.${key}`);
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 // 피드 자체에 대한 정보. ttl 은 다시 묻기까지의 간격(초), at 은 값의 시각(초 단위 유닉스 시각),

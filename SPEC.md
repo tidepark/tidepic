@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.2 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.3 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -40,6 +40,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
   "state": "live",
   "event": { "type": "score", "index": 1, "at": 1794787200 },
   "extra": { "baseball": { "inning": 7, "outs": 2 } },
+  "view":  { "title": "Seoul", "num": true },
   "meta":  { "ttl": 60 }
 }
 ```
@@ -53,7 +54,19 @@ People have been showing numbers as scenes instead of charts for a long time (se
 | `state` | no | Progress state |
 | `event` | no | A moment that just happened |
 | `extra` | no | Domain-specific data |
+| `view` | no | How the sender would like it shown (3.10) |
 | `meta` | no | Information about the feed itself (3.9) |
+
+A feed has four parts.
+
+| Part | Holds | Fields |
+|---|---|---|
+| Values | The numbers, and what each is read against | `values`, `focus`, `step` |
+| Moment | What kind of moment this is | `state`, `event` |
+| View | Display choices made by the sender | `view` |
+| Meta | Information about the feed itself | `meta` |
+
+`spec` and `extra` stand outside these. `spec` is the version, and `extra` is the part the rules do not read (3.6). A new field has to belong to one of the four parts.
 
 ### 3.1 `values`
 
@@ -201,6 +214,27 @@ Information about the feed itself, not about the scene.
 - The runtime uses `ttl` only. It does not draw `at` or `credit` on the scene.
 - A feed that passes someone else's data on can carry the credit that data asks for here.
 
+### 3.10 `view`
+
+```json
+"view": { "skin": "night", "title": "Seoul", "titleAt": "tl", "num": true, "numAt": "br" }
+```
+
+The sender's choices about display. The names and meanings are those of the settings in section 5.
+
+| Field | Meaning |
+|---|---|
+| `skin` | Which of the companion's skins to show |
+| `title` | Text for the title, up to 40 characters |
+| `titleAt` | Position of the title |
+| `num` | `true` shows the number, `false` hides it |
+| `numAt` | Position of the number |
+
+- `view` only chooses among what the companion already has. A skin name the companion does not have is not used.
+- An address parameter comes before `view`. If the address says `skin=plain`, the feed cannot change the skin.
+- `view` can change with every feed. A sender can show a night skin at night, or turn the number on for a while.
+- The picture files of a skin can also be replaced where they are stored, without changing the companion. That is outside the feed.
+
 ## 4. Data sources
 
 A companion gets its feed from one of four sources. All produce the same format.
@@ -276,7 +310,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | `until`, `since` | The date to count down to, and the day counting started | yes |
 | `assets` | Where skin images are loaded from | no — config file only |
 
-Order of precedence: address parameters, then the config file, then built-in defaults.
+Order of precedence: address parameters, then the feed's `view` (3.10), then the config file, then built-in defaults. Whoever put the companion on a screen comes before whoever sends the data.
 
 ### Title and number
 
@@ -469,7 +503,8 @@ A warning never blanks the screen. The companion draws what it can.
 - **Validate before use.** The runtime checks every feed against section 3 and passes on only what conforms.
 - **Never insert feed data as HTML.** Strings from a feed are data, not markup.
 - **The title is plain text**, at most 40 characters. It is never treated as markup.
-- **Skin files come from the address in the config file.** It cannot be changed through address parameters.
+- **Skin files come from the address in the config file.** It cannot be changed through address parameters or through a feed.
+- **A feed chooses only among what the companion already has.** `view` can name one of the companion's own skins, a position, on or off, and a short title. It carries no layout, no markup and no addresses.
 - **A skin names its files by plain file name.** No URLs, and no paths that leave the skin's folder.
 - **A server that renders or relays must not fetch addresses supplied by visitors.**
 - **Hosts should isolate companions they did not make**, for example in a sandboxed frame.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3 — 2026-11-17
+
+- New `view`: the sender can choose the skin, the title and the number. It uses the names of the settings and only chooses among what the companion already has. An address parameter comes before it (3.10, 5, 11).
+- Section 3 now says what the four parts of a feed are: values, moment, view, meta.
+
+- `view`를 더했다. 보내는 쪽이 스킨, 제목, 숫자를 고를 수 있다. 설정과 같은 이름을 쓰고, 컴패니언이 이미 가진 것 가운데서 고르기만 한다. 주소 인자가 이것보다 앞선다(3.10절, 5절, 11절).
+- 3절에 피드의 네 칸(값, 때, 보이기, 꼬리표)을 적었다.
+
 ## 0.2.2 — 2026-11-17
 
 - A value can say how its number reads: `unit` (`13.3°C`, `71,200원`) and `format` (`"duration"` shows seconds as `9:00`) (3.1, 5).

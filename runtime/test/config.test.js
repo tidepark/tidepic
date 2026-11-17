@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readConfig } from "../src/config.js";
+import { resolveView, readConfig } from "../src/config.js";
 
 const BASE = "https://tidepark.com/c/train/";
 
@@ -111,4 +111,39 @@ test("every 는 1초에서 하루 사이다", () => {
   assert.equal(readConfig({}, "?every=0.1", BASE).every, 60);
   assert.equal(readConfig({}, "?every=999999", BASE).every, 60);
   assert.equal(readConfig({}, "?every=1", BASE).every, 1);
+});
+
+test("보이기는 주소, 피드의 view, 설정 파일의 순으로 먼저 쓴다", () => {
+  const file = { skin: "alps", title: "파일", num: true };
+  const view = { skin: "plain", title: "피드", num: false, numAt: "tr" };
+
+  // 주소에 아무것도 없으면 피드가 설정 파일을 덮는다
+  assert.deepEqual(resolveView(readConfig(file, "", BASE), view), {
+    skin: "plain",
+    title: "피드",
+    titleAt: undefined,
+    num: false,
+    numAt: "tr",
+  });
+  // 주소에 적은 것은 피드보다 앞선다
+  const fromUrl = resolveView(readConfig(file, "?skin=night&title=주소&num=1&numAt=bl", BASE), view);
+  assert.deepEqual(fromUrl, {
+    skin: "night",
+    title: "주소",
+    titleAt: undefined,
+    num: true,
+    numAt: "bl",
+  });
+  // 주소에서 비우거나 끈 것도 주소가 정한 것이다
+  const off = resolveView(readConfig(file, "?title=&num=0", BASE), view);
+  assert.equal(off.title, "");
+  assert.equal(off.num, false);
+  // 피드에 view 가 없으면 설정 파일과 기본값이다
+  assert.deepEqual(resolveView(readConfig(file, "", BASE)), {
+    skin: "alps",
+    title: "파일",
+    titleAt: undefined,
+    num: true,
+    numAt: undefined,
+  });
 });

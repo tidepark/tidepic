@@ -1,7 +1,7 @@
 // tidepic 런타임. 컴패니언 안에서 설정을 읽고, 피드를 받아 검사하고, 그릴 값을 준비해 장면을 그린다.
 // 코드로 만든 컴패니언은 draw 를 넘기고, 경우표로 만든 컴패니언은 런타임이 장면을 보여 준다.
 
-import { readConfig } from "./config.js";
+import { readConfig, resolveView } from "./config.js";
 import { createSource } from "./source.js";
 import { computeFeed } from "./compute.js";
 import { judgeFeed, sceneConditions } from "./conditions.js";
@@ -17,7 +17,7 @@ export { judgeFeed, sceneConditions, CONDITION_NAMES } from "./conditions.js";
 export { readScenes, pickScene } from "./scenes.js";
 export { randomFeed } from "./random.js";
 export { dateFeed, parseDay } from "./dates.js";
-export { readConfig, POSITIONS } from "./config.js";
+export { readConfig, resolveView, POSITIONS } from "./config.js";
 export { checkFeed, checkReads } from "./check.js";
 export { drawOverlay, numberText, formatNumber, formatValue } from "./overlay.js";
 
@@ -172,14 +172,18 @@ export async function start({
   if (!byTable && typeof draw !== "function") {
     throw new Error("코드로 만든 컴패니언에는 draw 가 있어야 한다");
   }
-  const skin = byTable
-    ? await loadTable(companion, config, base, notify)
-    : await loadSkin(companion, config, base, notify);
-  const stage = byTable
+  // 보이기(스킨, 제목, 숫자)는 피드의 view 가 바꿀 수 있다. 주소에 적은 것이 언제나 앞선다.
+  let view = resolveView(config);
+  const loadFor = (slug) => {
+    const picked = { ...config, skin: slug };
+    return byTable
+      ? loadTable(companion, picked, base, notify)
+      : loadSkin(companion, picked, base, notify);
+  };
+  let skin = await loadFor(view.skin);
+  let stage = byTable
     ? createStage({ table: skin.table, files: skin.files, seed })
     : null;
-  const titleAt = config.titleAt ?? skin.overlay?.titleAt ?? "tl";
-  const numAt = config.numAt ?? skin.overlay?.numAt ?? "br";
 
   const reads = isObject(companion.reads) ? companion.reads : {};
   const count = reads.values === 2 ? 2 : reads.values === "many" ? 5 : 1;
@@ -210,6 +214,21 @@ export async function start({
       feed = result.feed;
       for (const name of result.dropped) {
         notify("warn", `dropped-${name}`, `형식이 맞지 않아 버렸다: ${name}`);
+      }
+      view = resolveView(config, feed.view);
+      // 다른 스킨을 고르면 바꾼다. 꾸러미에 없는 이름이면 pickSkin 이 기본 스킨을 고른다.
+      const wanted = pickSkin(companion, { ...config, skin: view.skin }, base)?.slug ?? "";
+      if (wanted !== skin.slug) {
+        try {
+          const next = await loadFor(view.skin);
+          if (mine !== round) return;
+          skin = next;
+          stage = byTable
+            ? createStage({ table: skin.table, files: skin.files, seed })
+            : null;
+        } catch (error) {
+          notify("warn", "skin", `스킨을 바꾸지 못했다: ${error.message}`);
+        }
       }
       target = computeFeed(feed);
       judged = judgeFeed(feed, target, { memory: judged?.memory });
@@ -316,10 +335,10 @@ export async function start({
     drawOverlay(ctx, {
       width,
       height,
-      title: config.title,
-      titleAt,
-      number: config.num ? numberText(feed.values, feed.focus) : "",
-      numAt,
+      title: view.title,
+      titleAt: view.titleAt ?? skin.overlay?.titleAt ?? "tl",
+      number: view.num ? numberText(feed.values, feed.focus) : "",
+      numAt: view.numAt ?? skin.overlay?.numAt ?? "br",
     });
   }
 

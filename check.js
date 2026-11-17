@@ -177,6 +177,9 @@ function show() {
   if (feed.values.length > 2) pairs.push(["focus", String(judged.focus)]);
   const kind = t.kinds[Math.min(feed.values.length, 3) - 1];
   whole.append(el("p", "", `${t.kind}: ${kind}`), chips(pairs));
+  if (feed.view) {
+    whole.append(chips(Object.entries(feed.view).map(([key, value]) => [`view.${key}`, String(value)])));
+  }
   if (feed.meta) {
     whole.append(chips(Object.entries(feed.meta).map(([key, value]) => [key, String(value)])));
   }

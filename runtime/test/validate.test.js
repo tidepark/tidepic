@@ -64,6 +64,24 @@ test("meta 는 ttl, at, credit 을 받는다. 맨 위의 ttl 은 읽지 않는�
   assert.deepEqual(old.dropped, ["ttl"]);
 });
 
+test("view 는 설정과 같은 이름만 받고, 틀린 것만 버린다", () => {
+  const feed = (view) => validateFeed({ spec: 1, values: [{ value: 1 }], view });
+  const good = { skin: "alps", title: "서울", titleAt: "tl", num: true, numAt: "br" };
+  assert.deepEqual(feed(good).feed.view, good);
+  const bad = feed({
+    skin: "../other",
+    title: "<b>제목</b>",
+    titleAt: "middle",
+    num: 1,
+    numAt: "br",
+    layout: { x: 1 },
+  });
+  assert.deepEqual(bad.feed.view, { numAt: "br" }); // 모르는 항목(layout)은 그냥 지나친다
+  assert.deepEqual(bad.dropped.sort(), ["view.num", "view.skin", "view.title", "view.titleAt"]);
+  assert.deepEqual(feed("alps").dropped, ["view"]);
+  assert.equal(feed({ title: "가".repeat(41) }).feed.view, undefined);
+});
+
 test("focus 는 values 안의 순서여야 한다", () => {
   const feed = (focus) => ({ spec: 1, values: [{ value: 1 }, { value: 2 }, { value: 3 }], focus });
   assert.equal(validateFeed(feed(2)).feed.focus, 2);

@@ -160,5 +160,23 @@ export function readConfig(file, search = "", base) {
     num: first(parseNum, fromUrl.num, file.num) ?? false,
     numAt: first(parsePosition, fromUrl.numAt, file.numAt),
     assets,
+    // 주소에 적은 것만 따로 둔다. 피드의 view 보다 앞서기 때문이다.
+    fixed: {
+      skin: first(parseSlug, fromUrl.skin),
+      title: first(parseTitle, fromUrl.title),
+      titleAt: first(parsePosition, fromUrl.titleAt),
+      num: fromUrl.num === undefined ? undefined : parseNum(fromUrl.num),
+      numAt: first(parsePosition, fromUrl.numAt),
+    },
   };
+}
+
+// 보이기를 정한다 (규칙 5절). 주소에 적은 것, 피드의 view, 설정 파일의 순으로 먼저 쓴다.
+// 화면을 걸어 둔 사람(주소)이 보내는 쪽(피드)보다 앞선다.
+export function resolveView(config, view = {}) {
+  const out = {};
+  for (const key of ["skin", "title", "titleAt", "num", "numAt"]) {
+    out[key] = config.fixed[key] ?? view[key] ?? config[key];
+  }
+  return out;
 }
