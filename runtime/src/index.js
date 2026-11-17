@@ -9,6 +9,7 @@ import { checkLottie, loadLottie } from "./lottie.js";
 import { isLottie, isVideo, readScenes, tableFiles, unjudged } from "./scenes.js";
 import { createStage } from "./stage.js";
 import { checkFeed, checkReads } from "./check.js";
+import { pickOptions, readOptions } from "./options.js";
 import { drawOverlay, numberText } from "./overlay.js";
 
 export { validateFeed, parseFeed, LIMITS } from "./validate.js";
@@ -19,6 +20,7 @@ export { randomFeed } from "./random.js";
 export { dateFeed, parseDay } from "./dates.js";
 export { readConfig, resolveView, POSITIONS } from "./config.js";
 export { checkFeed, checkReads } from "./check.js";
+export { pickOptions, readOptions } from "./options.js";
 export { drawOverlay, numberText, formatNumber, formatValue } from "./overlay.js";
 
 const FRAME_MS = 1000 / 30; // 초당 30장을 넘지 않는다 (규칙 10절)
@@ -71,7 +73,7 @@ function pickSkin(companion, config, base) {
 
 // 코드로 그리는 컴패니언의 스킨 (skin.json): 그림과 배치 숫자
 async function loadSkin(companion, config, base, notify) {
-  const empty = { slug: "", images: {}, layout: {}, overlay: {} };
+  const empty = { slug: "", images: {}, layout: {}, overlay: {}, options: {} };
   const picked = pickSkin(companion, config, base);
   if (!picked) return empty;
   let json;
@@ -101,6 +103,7 @@ async function loadSkin(companion, config, base, notify) {
     images,
     layout: isObject(json.layout) ? json.layout : {},
     overlay: isObject(json.overlay) ? json.overlay : {},
+    options: readOptions(json.options), // 이 스킨이 바꿀 수 있다고 밝힌 항목
   };
 }
 
@@ -185,6 +188,16 @@ export async function start({
   let stage = byTable
     ? createStage({ table: skin.table, files: skin.files, seed })
     : null;
+  // 스킨에 선택 항목을 입힌다 (규칙 7.3절). 스킨이 밝힌 항목만 받고, 받은 값은 layout 위에 덮는다.
+  let dressed = skin;
+  const dress = () => {
+    const { values, dropped } = pickOptions(skin.options ?? {}, view.options);
+    for (const name of dropped) {
+      notify("warn", `option-${name}`, `스킨이 받지 않는 선택 항목이다: ${name}`);
+    }
+    dressed = { ...skin, layout: { ...skin.layout, ...values } };
+  };
+  dress();
 
   const reads = isObject(companion.reads) ? companion.reads : {};
   // 난수로 만들 값의 개수 (잠정). 여럿을 읽는 컴패니언에는 열두 개를 준다.
@@ -234,6 +247,7 @@ export async function start({
           notify("warn", "skin", `스킨을 바꾸지 못했다: ${error.message}`);
         }
       }
+      dress();
       target = computeFeed(feed);
       judged = judgeFeed(feed, target, { memory: judged?.memory });
       for (const n of [...checkFeed(feed), ...checkReads(reads, feed, target)]) {
@@ -338,7 +352,7 @@ export async function start({
         state,
         event: happened,
         extra: feed.extra ?? {},
-        skin,
+        skin: dressed,
         width,
         height,
         time,

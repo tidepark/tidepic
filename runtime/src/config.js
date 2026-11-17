@@ -145,6 +145,12 @@ export function readConfig(file, search = "", base) {
     if (params.has(key)) fromUrl[key] = params.get(key);
   }
 
+  // skin.<이름> 으로 적은 것은 스킨의 선택 항목이다 (규칙 7.3절). 스킨이 받는지는 나중에 가린다.
+  const skinOptions = {};
+  for (const [key, value] of params) {
+    if (key.startsWith("skin.") && key.length > 5) skinOptions[key.slice(5)] = value;
+  }
+
   const origins = Array.isArray(file.dataOrigins)
     ? file.dataOrigins.filter((o) => typeof o === "string" && o.length > 0)
     : [];
@@ -168,8 +174,10 @@ export function readConfig(file, search = "", base) {
     num: first(parseNum, fromUrl.num, file.num) ?? false,
     numAt: first(parsePosition, fromUrl.numAt, file.numAt),
     assets,
+    options: isObject(file.options) ? file.options : {},
     // 주소에 적은 것만 따로 둔다. 피드의 view 보다 앞서기 때문이다.
     fixed: {
+      options: skinOptions,
       skin: first(parseSlug, fromUrl.skin),
       title: first(parseTitle, fromUrl.title),
       titleAt: first(parsePosition, fromUrl.titleAt),
@@ -186,5 +194,7 @@ export function resolveView(config, view = {}) {
   for (const key of ["skin", "title", "titleAt", "num", "numAt"]) {
     out[key] = config.fixed[key] ?? view[key] ?? config[key];
   }
+  // 스킨의 선택 항목도 같은 순서로 덮는다.
+  out.options = { ...config.options, ...view.options, ...config.fixed.options };
   return out;
 }

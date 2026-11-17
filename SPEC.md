@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.5 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.6 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -238,6 +238,7 @@ The sender's choices about display. The names and meanings are those of the sett
 | `titleAt` | Position of the title |
 | `num` | `true` shows the number, `false` hides it |
 | `numAt` | Position of the number |
+| `options` | Values for the skin's options (7.3). Numbers and short text only |
 
 - `view` only chooses among what the companion already has. A skin name the companion does not have is not used.
 - An address parameter comes before `view`. If the address says `skin=plain`, the feed cannot change the skin.
@@ -322,6 +323,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | `until`, `since` | The date to count down to, and the day counting started | yes |
 | `assets` | Where skin images are loaded from | no — config file only |
 | `dataOrigins` | A list of beginnings of feed URLs that are accepted. Without it there is no restriction | no — config file only |
+| `options` | Values for the skin's options (7.3) | written as `skin.<name>` |
 
 Order of precedence: address parameters, then the feed's `view` (3.10), then the config file, then built-in defaults. Whoever put the companion on a screen comes before whoever sends the data.
 
@@ -447,6 +449,44 @@ For a companion drawn by code. The skin supplies the images and the numbers the 
 
 The keys under `images` and `layout` are defined by each companion.
 
+### 7.3 Options
+
+A skin can say which parts of its look can be changed, such as the shape or color of a petal. Whoever makes the skin decides what it accepts. These rules only say how to declare options and how to pass values.
+
+```json
+{
+  "slug": "poppy",
+  "layout": { "petal": "round", "petals": 6, "from": "#c2201c", "to": "#ff8a4a" },
+  "options": {
+    "petal": ["wedge", "round", "pointed", "notched"],
+    "petals": [4, 24],
+    "from": "color",
+    "to": "color"
+  }
+}
+```
+
+The names in `options` are names in `layout`. A value that is accepted replaces the one in `layout`. Each option is declared in one of three ways.
+
+| Declared as | Accepts |
+|---|---|
+| A list of words `["round", "pointed"]` | One of them |
+| Two numbers `[4, 24]` | A number between them. Whole numbers only if both are whole |
+| `"color"` | A color, `#rrggbb` |
+
+Values can come from three places. An earlier one overrides a later one.
+
+1. The address: `skin.petal=round&skin.from=ffb000`. A color is written without the `#`
+2. `view.options` in the feed (3.10)
+3. `options` in the config file (5)
+
+- An option that is not given keeps the value in the skin's `layout`.
+- An option the skin did not declare, and a value outside what it declared, are not accepted. They are dropped, not repaired, and the runtime gives notice.
+- No option takes free text.
+- Options change the look only. They do not change how numbers are read.
+- When the skin changes, the options are checked again against what the new skin declares.
+- Up to sixteen options. A name starts with a letter and is at most 32 characters.
+
 ## 8. Grades
 
 | | Basic | Free |
@@ -518,6 +558,7 @@ A warning never blanks the screen. The companion draws what it can.
 - **The title is plain text**, at most 40 characters. It is never treated as markup.
 - **Skin files come from the address in the config file.** It cannot be changed through address parameters or through a feed.
 - **A feed chooses only among what the companion already has.** `view` can name one of the companion's own skins, a position, on or off, and a short title. It carries no layout, no markup and no addresses.
+- **A skin's options take only what the skin declared, within what it declared.** That holds whether the value comes from the address or from a feed.
 - **A skin names its files by plain file name.** No URLs, and no paths that leave the skin's folder.
 - **A server that renders or relays must not fetch addresses supplied by visitors.**
 - **Hosts should isolate companions they did not make**, for example in a sandboxed frame.

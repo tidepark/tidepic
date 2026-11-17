@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6 — 2026-11-17
+
+- A skin can declare options: parts of its look that can be changed, each one a choice of words, a range of numbers, or a color. Values come from the address (`skin.<name>`), from `view.options` in the feed, or from `options` in the config file, in that order. Anything the skin did not declare is dropped (3.10, 5, 7.3, 11).
+
+- 스킨이 선택 항목을 밝힐 수 있다. 자기 모습 가운데 바꿀 수 있는 것이고, 항목마다 낱말 가운데 하나, 수의 범위, 색 가운데 하나로 밝힌다. 값은 주소(`skin.<이름>`), 피드의 `view.options`, 설정 파일의 `options` 순으로 받는다. 스킨이 밝히지 않은 것은 버린다(3.10절, 5절, 7.3절, 11절).
+
 ## 0.2.5 — 2026-11-17
 
 A read-through after eight versions in one day. The text now matches the runtime. No rule changed.

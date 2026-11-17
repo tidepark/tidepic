@@ -131,6 +131,7 @@ test("보이기는 주소, 피드의 view, 설정 파일의 순으로 먼저 쓴
     titleAt: undefined,
     num: false,
     numAt: "tr",
+    options: {},
   });
   // 주소에 적은 것은 피드보다 앞선다
   const fromUrl = resolveView(readConfig(file, "?skin=night&title=주소&num=1&numAt=bl", BASE), view);
@@ -140,6 +141,7 @@ test("보이기는 주소, 피드의 view, 설정 파일의 순으로 먼저 쓴
     titleAt: undefined,
     num: true,
     numAt: "bl",
+    options: {},
   });
   // 주소에서 비우거나 끈 것도 주소가 정한 것이다
   const off = resolveView(readConfig(file, "?title=&num=0", BASE), view);
@@ -152,5 +154,20 @@ test("보이기는 주소, 피드의 view, 설정 파일의 순으로 먼저 쓴
     titleAt: undefined,
     num: true,
     numAt: undefined,
+    options: {},
   });
+});
+
+test("스킨의 선택 항목은 주소의 skin.<이름>, 피드의 view.options, 설정 파일의 options 순이다", () => {
+  const file = { options: { petal: "wedge", petals: 10, from: "#111111" } };
+  const view = { options: { petal: "round", petals: 6 } };
+  const config = readConfig(file, "?skin=poppy&skin.petal=pointed&skin.to=fff3c4", BASE);
+  assert.equal(config.skin, "poppy"); // skin 과 skin.<이름> 은 따로다
+  assert.deepEqual(resolveView(config, view).options, {
+    petal: "pointed",
+    petals: 6,
+    from: "#111111",
+    to: "fff3c4",
+  });
+  assert.deepEqual(resolveView(readConfig({}, "", BASE)).options, {});
 });

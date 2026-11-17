@@ -82,6 +82,19 @@ test("view 는 설정과 같은 이름만 받고, 틀린 것만 버린다", () =
   assert.equal(feed({ title: "가".repeat(41) }).feed.view, undefined);
 });
 
+test("view.options 는 숫자와 짧은 글자만 받는다", () => {
+  const feed = (options) => validateFeed({ spec: 1, values: [{ value: 1 }], view: { options } });
+  assert.deepEqual(feed({ petal: "round", petals: 6, from: "#ffb000" }).feed.view, {
+    options: { petal: "round", petals: 6, from: "#ffb000" },
+  });
+  for (const bad of [{ a: "<b>" }, { a: { b: 1 } }, { a: [1] }, "round", { a: "x".repeat(33) }]) {
+    const read = feed(bad);
+    assert.equal(read.feed.view, undefined);
+    assert.deepEqual(read.dropped, ["view.options"]);
+  }
+  assert.equal(feed({}).feed.view, undefined);
+});
+
 test("값마다 상태를 적을 수 있고, 고장은 fault 다", () => {
   const read = validateFeed({
     spec: 1,

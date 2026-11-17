@@ -174,6 +174,19 @@ function cleanView(view, dropped) {
     if (ok(view[key])) out[key] = view[key];
     else dropped.push(`view.${key}`);
   }
+  // 스킨의 선택 항목. 숫자와 짧은 글자만 받는다. 스킨이 받는 항목인지는 런타임이 가린다.
+  if (view.options !== undefined) {
+    const entries = isObject(view.options) ? Object.entries(view.options) : null;
+    const fine =
+      entries &&
+      entries.length <= 16 &&
+      entries.every(
+        ([key, value]) =>
+          !UNSAFE_KEYS.has(key) && key.length <= 32 && (isNum(value) || isText(value, 32)),
+      );
+    if (fine && entries.length) out.options = Object.fromEntries(entries);
+    else if (!fine) dropped.push("view.options");
+  }
   return Object.keys(out).length ? out : null;
 }
 

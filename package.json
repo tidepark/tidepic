@@ -1,6 +1,6 @@
 {
   "name": "tidepic",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Rules for showing numbers as scenery, and the runtime that plays them.",
   "private": true,
   "type": "module",
