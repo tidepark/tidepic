@@ -2,12 +2,14 @@
 
 > tidepic is a set of rules for showing numbers as scenery instead of charts. A sender publishes a small JSON feed. A companion (a web page) reads the feed and turns it into a scene: flowers that open, a train that climbs, windows that light up.
 
-If you are asked to connect some data to a tidepic scene, you are almost always being asked to write a feed. Start with the guide.
+If you are asked to connect some data to a tidepic scene, you are being asked to write a feed. If you are asked to make a new scene, you are being asked to make a companion. There is a guide for each.
 
 ## Read first
 
 - [Guide for writing a feed](https://tidepic.com/GUIDE.md): the shape of a feed, which fields to use for which kind of number, examples, common mistakes
 - [안내: 피드 쓰는 법](https://tidepic.com/GUIDE.ko.md): the same guide in Korean
+- [Guide for making a companion](https://tidepic.com/COMPANION.md): deciding what the numbers become, the two ways to make one (a case table, or drawing code), the files, images, and how to check it
+- [안내: 컴패니언 만드는 법](https://tidepic.com/COMPANION.ko.md): the same guide in Korean
 
 ## Reference
 

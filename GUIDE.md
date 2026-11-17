@@ -174,4 +174,4 @@ Numbers written in an address can be read by anyone who sees that address. Use a
 
 ## 10. Making a companion
 
-A companion is a web page that follows the spec. The quickest start is the [case table example](examples/table/): a table (`scenes.json`) that says which image to show under which condition, with no drawing code. Sections 5 to 8 of the [spec](SPEC.md) cover the bundle, the declaration file, skins and the drawing function.
+There is a separate guide: [Making a companion](COMPANION.md). To have an AI assistant build one, give it that page's address (`https://tidepic.com/COMPANION.md`) and describe the scene.
