@@ -39,8 +39,8 @@
 <main>
   <h1>Rules for showing numbers as scenes instead of charts.</h1>
   <p class="sub">A scene is for reading the mood, not the exact number.</p>
-  <section class="demo" aria-label="All four panels below are reading this one line.">
-    <p class="lead">All four panels below are reading this one line.</p>
+  <section class="demo" aria-label="All six panels below are reading this one line.">
+    <p class="lead">All six panels below are reading this one line.</p>
     <pre>{ "spec": 1, "values": [ { "value": <output id="value" for="range">62</output>, "to": 100 } ] }</pre>
     <label class="dial">Change the number
       <input id="range" type="range" min="0" max="100" value="62">
@@ -58,19 +58,28 @@
       <span>The usual readout</span>
     </li>
     <li>
-      <div class="panel"><iframe data-c="vase" data-q="" src="https://tidepark.com/c/vase?v=62&amp;to=100" title="Vase" loading="lazy" tabindex="-1"></iframe></div>
+      <div class="panel scene" data-c="vase" data-q="" data-title="Vase"><img src="https://tidepark.com/c/vase.jpg?v=62&amp;to=100&amp;w=640&amp;h=480" alt="" width="640" height="480" loading="lazy"></div>
       <a href="https://tidepark.com/gallery/vase">Vase</a>
     </li>
     <li>
-      <div class="panel"><iframe data-c="campfire" data-q="" src="https://tidepark.com/c/campfire?v=62&amp;to=100" title="Campfire" loading="lazy" tabindex="-1"></iframe></div>
+      <div class="panel scene" data-c="face" data-q="" data-title="Face"><img src="https://tidepark.com/c/face.jpg?v=62&amp;to=100&amp;w=640&amp;h=480" alt="" width="640" height="480" loading="lazy"></div>
+      <a href="https://tidepark.com/gallery/face">Face</a>
+    </li>
+    <li>
+      <div class="panel scene" data-c="campfire" data-q="" data-title="Campfire"><img src="https://tidepark.com/c/campfire.jpg?v=62&amp;to=100&amp;w=640&amp;h=480" alt="" width="640" height="480" loading="lazy"></div>
       <a href="https://tidepark.com/gallery/campfire">Campfire</a>
     </li>
     <li>
-      <div class="panel"><iframe data-c="fishbowl" data-q="" src="https://tidepark.com/c/fishbowl?v=62&amp;to=100" title="Fishbowl" loading="lazy" tabindex="-1"></iframe></div>
+      <div class="panel scene" data-c="fishbowl" data-q="" data-title="Fishbowl"><img src="https://tidepark.com/c/fishbowl.jpg?v=62&amp;to=100&amp;w=640&amp;h=480" alt="" width="640" height="480" loading="lazy"></div>
       <a href="https://tidepark.com/gallery/fishbowl">Fishbowl</a>
     </li>
+    <li>
+      <div class="panel scene" data-c="bamboo" data-q="" data-title="Bamboo"><img src="https://tidepark.com/c/bamboo.jpg?v=62&amp;to=100&amp;w=640&amp;h=480" alt="" width="640" height="480" loading="lazy"></div>
+      <a href="https://tidepark.com/gallery/bamboo">Bamboo</a>
+    </li>
     </ul>
-    <p class="note">The first panel is the usual readout. The other three are companions that follow tidepic, loaded as they are from the Tidepark gallery.</p>
+    <p class="note">The first panel is the usual readout. The other five are companions that follow tidepic, loaded as they are from the Tidepark gallery.</p>
+    <p class="note tap">Tap a panel to see it move.</p>
   </section>
   <div class="text">
     <p class="lines">This number could be stock left on a shelf,<br>or today's step count,<br>or stickers on a chart.</p>
