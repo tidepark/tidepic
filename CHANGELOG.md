@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7 — 2026-11-17
+
+- Inline values can carry `scale` and `momentum` in the address, so a scene that follows rise or momentum can be driven by an address alone (4, 5).
+- 주소에 직접 적는 값에 `scale`과 `momentum`을 적을 수 있다. 오르내림이나 기울기를 따르는 장면도 주소만으로 움직일 수 있다(4절, 5절).
+
 ## 0.1.6 — 2026-11-16
 
 - A case table can show a Lottie file. `follow` holds it at the position of a derived value instead of looping (5, 7.1).

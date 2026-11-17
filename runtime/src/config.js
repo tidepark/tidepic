@@ -21,6 +21,8 @@ const URL_KEYS = [
   "low",
   "high",
   "base",
+  "scale",
+  "momentum",
   "until",
   "since",
 ];
@@ -65,12 +67,12 @@ function parseList(x) {
     : undefined;
 }
 
-// 주소에 직접 적은 값을 피드의 values 로 바꾼다. 하나만 적은 low·high·base 는 모든 값에 쓴다.
+// 주소에 직접 적은 값을 피드의 values 로 바꾼다. 하나만 적은 low·high 같은 값은 모든 값에 쓴다.
 function inlineValues(raw) {
   const v = first(parseList, raw.v);
   if (!v) return undefined;
   const lists = {};
-  for (const key of ["low", "high", "base"]) {
+  for (const key of ["low", "high", "base", "scale", "momentum"]) {
     lists[key] = first(parseList, raw[key]);
   }
   return v.map((value, i) => {

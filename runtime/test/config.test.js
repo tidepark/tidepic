@@ -51,6 +51,13 @@ test("v 를 적으면 주소에 직접 적은 값을 쓴다", () => {
       { value: 102, low: 0, high: 120 },
     ],
   });
+  assert.deepEqual(
+    readConfig({}, "?v=102&base=100&scale=5&momentum=-0.4", BASE).source,
+    {
+      kind: "inline",
+      values: [{ value: 102, base: 100, scale: 5, momentum: -0.4 }],
+    },
+  );
   assert.deepEqual(readConfig({}, "?v=1,,3", BASE).source, { kind: "random" });
   assert.deepEqual(readConfig({}, "?v=abc", BASE).source, { kind: "random" });
 });

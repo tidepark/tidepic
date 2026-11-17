@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.1.6 (draft) · 2026-11-16 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.7 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -181,6 +181,7 @@ A companion gets its feed from one of four sources. All produce the same format.
 
 - Random is a source, not a special mode. Every companion therefore runs with no setup.
 - The date source gives the days left as `value` (3.1). On the day itself it is 0. After that it stays 0 and `state` becomes `"done"`. Add the starting day as `since=2026-11-01` and the total number of days becomes `high`. Dates are written `YYYY-MM-DD`, and the day changes in the viewer's own time zone.
+- Inline values take the numeric fields of `values` (`low`, `high`, `base`, `scale`, `momentum`) under the same names. Example: `v=102&base=100&scale=5&momentum=0.4`. A single number applies to every value. Write `high=110,120` when they differ. `better` cannot be written in the address.
 - If more than one is given, `data` wins over `v`, and `v` over `until`.
 - A URL source must allow cross-origin requests (CORS).
 - A site or host may restrict which feed URLs it accepts.
@@ -237,7 +238,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | `titleAt` | Where the title goes (see below). Default `tl` | yes |
 | `num` | `1` shows the number. Default `0` | yes |
 | `numAt` | Where the number goes. Default `br` | yes |
-| `v`, `low`, `high`, `base` | Inline values | yes |
+| `v`, `low`, `high`, `base`, `scale`, `momentum` | Inline values (4) | yes |
 | `until`, `since` | The date to count down to, and the day counting started | yes |
 | `assets` | Where skin images are loaded from | no — config file only |
 
