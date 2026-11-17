@@ -63,8 +63,20 @@ test("share 는 그 값 ÷ 값들의 합이다", () => {
   const lead = computeFeed(feedOf(1, 10));
   near(lead[0].share, 1 / 11);
   near(lead[1].share, 10 / 11);
-  assert.deepEqual(computeFeed(feedOf(3)).map((c) => c.share), [1]);
   near(computeFeed(feedOf(50, 30, 20))[1].share, 0.3);
+});
+
+test("rank 는 큰 순서다. 같은 값은 같은 순위다", () => {
+  const rank = (...values) => computeFeed(feedOf(...values)).map((c) => c.rank);
+  assert.deepEqual(rank(512, 430, 58), [1, 2, 3]);
+  assert.deepEqual(rank(3.1, 2.9, 3.4, 2.2, 3.0), [2, 4, 1, 5, 3]);
+  assert.deepEqual(rank(2, 2, 1), [1, 1, 3]);
+});
+
+test("값이 하나이면 견줄 것이 없어 share 와 rank 가 없다", () => {
+  const [only] = computeFeed(feedOf(3));
+  assert.equal(only.share, null);
+  assert.equal(only.rank, null);
 });
 
 test("음수가 섞이거나 합이 0 이면 share 는 없다", () => {

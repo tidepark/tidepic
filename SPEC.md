@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.0 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.1 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -26,7 +26,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
 2. **Senders send raw numbers.** Scaling to 0–1 is the runtime's job.
 3. **Common fields are always enough to draw.** Domain-specific data (`extra`) only enriches the scene.
 4. **Unknown fields are ignored.** They are never an error.
-5. **A scene is decided by the current numbers alone.** A companion only shows the current numbers in another form. It does not draw a graph or fill in between past values. The same feed gives the same scene, whenever and however often it is fetched.
+5. **A scene is decided by the current numbers alone.** A companion only shows the current numbers in another form. It does not draw a graph or fill in between past values. The same feed gives the same scene, whenever and however often it is fetched. There is one exception, and it applies only to a screen that keeps updating: near a boundary it may hold the previous condition a little longer (3.7).
 
 ## 3. Feed format
 
@@ -36,7 +36,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
   "values": [
     { "value": 71200, "from": 70100, "to": 71900, "base": 70500, "rate": 45, "rateScale": 150 }
   ],
-  "step":  { "now": 2, "total": 4 },
+  "step":  { "value": 2, "to": 4 },
   "state": "live",
   "event": { "type": "score", "index": 1, "at": 1794787200 },
   "extra": { "baseball": { "inning": 7, "outs": 2 } },
@@ -48,6 +48,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
 |---|---|---|
 | `spec` | yes | Major version of this format. Currently `1` |
 | `values` | yes | List of values. At least one |
+| `focus` | no | Which value the case table and the number look at, counting from 0. Defaults to 0 |
 | `step` | no | A stage: "which one out of how many" |
 | `state` | no | Progress state |
 | `event` | no | A moment that just happened |
@@ -90,22 +91,26 @@ A companion draws from these, not from the raw numbers. Each one is (a number �
 | `under` | 0 to 1 | How far short of `from`, counted in ranges. 0 inside the range | `to` |
 | `rise` | −1 to 1 | (`value` − `base`) ÷ `scale` | `base`, and `scale` or a range |
 | `momentum` | −1 to 1 | `rate` ÷ `rateScale` | `rate` and `rateScale` |
-| `share` | 0 to 1 | `value` ÷ sum of all values | — |
+| `share` | 0 to 1 | `value` ÷ sum of all values | Two or more values |
+| `rank` | 1, 2, 3… | Order by size. 1 is the largest | Two or more values |
 
 - `fill` is clamped to 0…1. What falls outside goes to `over` and `under`. 132 against a goal of 100 gives `fill` 1 and `over` 0.32.
 - The span for `rise` is `scale` if sent, otherwise the size of the range (`to` − `from`). Results are clamped to −1…1. This rule is provisional (see section 13).
 - Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the rate of change (`rate`). The unit of time is the sender's choice, as long as `rate` and `rateScale` use the same one.
 - A missing `from` counts as 0. When the numbers a value needs are missing, the value is absent: no `fill` without `to`, no `rise` without `base` or a span, no `momentum` without `rate` or `rateScale`. Section 9 says when the runtime gives notice.
 - `share` is for comparing numbers that have no upper end, such as scores. 1 against 10 gives 0.09 and 0.91. If any value is negative or the sum is 0, there is no `share`.
+- `rank` is the order by size. The largest value is 1, and equal values share a rank. With a single value there is nothing to compare, so there is no `share` and no `rank`.
 - The runtime may ease the scene into place when a new value arrives. It does not change the value it arrives at. A still image always shows the arrived value.
 
 ### 3.3 `step`
 
 ```json
-"step": { "now": 2, "total": 4 }
+"step": { "value": 2, "to": 4 }
 ```
 
-A quarter, a set, a delivery stage, a pomodoro round. `total` is optional.
+A quarter, a set, a delivery stage, a pomodoro round. A step has the same shape as a value: `value` is which one it is now, counting from 1, and `to` is the last one. `to` is optional.
+
+A step is not put in `values`, because the number of values decides the kind of scene (3.1).
 
 ### 3.4 `state`
 
@@ -154,13 +159,14 @@ The runtime also turns the derived values into named conditions. Every companion
 | `trend` | `fall`, `flat`, `rise` | `rise`: below −0.1, in between, above 0.1 |
 | `drift` | `down`, `still`, `up` | `momentum`: below −0.1, in between, above 0.1 |
 | `pace` | `calm`, `brisk` | Size of `momentum`: below 0.3, or not |
-| `lead` | `first`, `tie`, `second` | With two values, which one is ahead |
+| `ahead` | `yes`, `tie`, `no` | Whether this value is the largest: alone, together with another, or not. Needs two or more values |
+| `step` | `first`, `mid`, `last` | `step`: 1 or less, in between, or `to` reached |
 | `state` | `live`, `idle`, `done`, `stale` | Section 3.4. `stale` is set by the runtime |
 
-- Conditions are worked out for each value.
+- `level`, `bound`, `trend`, `drift`, `pace` and `ahead` are worked out for each value. A case table looks at the value that `focus` points to.
 - A condition that cannot be worked out is absent. Without `base` there is no `trend`, and without `rate` there is no `drift` or `pace`.
 - `level` stays `full` when the value passes `to`. `bound` tells the two apart.
-- **No flicker at the edges.** Once a condition changes, the value must move a further 0.03 past the boundary before it changes back.
+- **No flicker at the edges.** Once a condition changes, the value must move a further 0.03 past the boundary before it changes back. This holding applies only while a screen keeps updating. A still image, and the first frame of a screen, are judged from the boundaries alone with no previous state. So a still image of the same feed is always the same.
 - **Conditions pick the scene; derived values fine-tune it.** The derived values stay available for speed and amount, so 62% and 68% need not look identical.
 - The boundaries above are provisional (section 13).
 
@@ -266,7 +272,7 @@ bl  bc  br
 
 - The runtime draws them on top of the scene. A companion's drawing code never draws text, so every companion gets the same title and number.
 - They are drawn on the canvas, not as page elements, so a still image shows them too.
-- With one value the number is that value. With two it is shown as `92 : 102`. With more, no number is shown.
+- With one value the number is that value. With two it is shown as `92 : 102`. With more, it is the value that `focus` points to.
 - If both land in the same cell, the title sits above the number.
 - A skin may suggest positions that suit its artwork (`"overlay": { "titleAt": "tc", "numAt": "bc" }` in `skin.json`). The viewer's choice wins.
 
@@ -391,7 +397,8 @@ A companion made as a case table has no drawing code; the runtime shows its scen
 
 ```js
 draw(ctx, {
-  values,   // [{ fill, over, under, rise, momentum, share, raw }]
+  values,   // [{ fill, over, under, rise, momentum, share, rank, raw }]
+  focus,    // which value the case table and the number look at
   step, state, event, extra,
   skin,     // images and layout numbers
   width, height,
@@ -456,9 +463,7 @@ A warning never blanks the screen. The companion draws what it can.
 
 - The scale for `rise`. Values with very different volatility should still read as the same slope.
 - The boundaries of the conditions in section 3.7, and whether a viewer may adjust the `flat` range.
-- How a case table handles many values.
 - The time zone of the date source. It is the viewer's for now, but a server that renders still images may be in another one.
-- The rule that keeps conditions from flickering at a boundary (3.7) remembers the previous state. How to square it with the fifth principle in section 2. A still image is judged with no previous state.
 - The list of effects.
 - Which Lottie features are allowed, and the size limit of a Lottie file.
 - The fields of `skin.json`.

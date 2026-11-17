@@ -8,13 +8,12 @@ export function formatNumber(n) {
   return (rounded < 0 ? "-" : "") + grouped + (frac ? "." + frac : "");
 }
 
-// 값이 1개면 그 값, 2개면 "92 : 102", 그보다 많으면 숫자를 보여 주지 않는다.
-export function numberText(values) {
-  if (values.length === 1) return formatNumber(values[0].value);
+// 값이 1개면 그 값, 2개면 "92 : 102", 그보다 많으면 focus 가 가리키는 값을 보여 준다.
+export function numberText(values, focus = 0) {
   if (values.length === 2) {
     return `${formatNumber(values[0].value)} : ${formatNumber(values[1].value)}`;
   }
-  return "";
+  return formatNumber(values[values.length === 1 ? 0 : focus].value);
 }
 
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));

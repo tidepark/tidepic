@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.1 — 2026-11-17
+
+- `focus` says which value the case table and the number look at. It replaces "the first value" (3, 3.7, 5).
+- `lead` became `ahead`: `yes`, `tie`, `no`, worked out for each value, for any number of values. With two values, `ahead: yes` on the first is what `lead: first` was (3.7).
+- New derived value `rank`. A single value has no `share` and no `rank` (3.2).
+- `step` has the same shape as a value: `{ "value": 2, "to": 4 }`. It used to be `{ "now": 2, "total": 4 }`. New condition `step`: `first`, `mid`, `last` (3.3, 3.7).
+- With three or more values the number shown is the one `focus` points to. It used to be hidden (5).
+- The fifth principle and the no-flicker rule now say the same thing: holding a condition near a boundary applies only to a screen that keeps updating. A still image and the first frame are judged from the boundaries alone (2, 3.7).
+
+- `focus`는 경우표와 숫자가 볼 값을 정한다. 「첫째 값」 대신 쓴다(3절, 3.7절, 5절).
+- `lead`가 `ahead`가 되었다. `yes`, `tie`, `no`이고 값마다 판정하며, 값이 몇 개든 된다. 값이 둘일 때 첫째 값의 `ahead: yes`가 전의 `lead: first`다(3.7절).
+- 계산된 값 `rank`를 더했다. 값이 하나이면 `share`와 `rank`가 없다(3.2절).
+- `step`이 값과 같은 모양이 되었다. `{ "value": 2, "to": 4 }`이고, 전에는 `{ "now": 2, "total": 4 }`였다. 조건 `step`(`first`, `mid`, `last`)을 더했다(3.3절, 3.7절).
+- 값이 셋 이상이면 `focus`가 가리키는 값을 숫자로 보여 준다. 전에는 보여 주지 않았다(5절).
+- 다섯째 원칙과 깜빡임 방지 규칙이 같은 말을 하게 고쳤다. 경계 가까이에서 조건을 붙드는 것은 이어서 갱신되는 화면에만 있다. 정지 그림과 첫 장은 경계 값만으로 판정한다(2절, 3.7절).
+
 ## 0.2.0 — 2026-11-17
 
 The fields of a value changed. Feeds written for 0.1 need to be rewritten. Every derived value is now (a number − an origin) ÷ a span.

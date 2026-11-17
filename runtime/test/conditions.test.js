@@ -59,12 +59,41 @@ test("판정할 수 없는 조건은 없다", () => {
   assert.deepEqual(one({ value: 5, rate: 1 }), {}); // 폭이 없다
 });
 
-test("lead 는 값이 2개일 때만 있다", () => {
-  assert.equal(judge([{ value: 3 }, { value: 1 }]).lead, "first");
-  assert.equal(judge([{ value: 1 }, { value: 10 }]).lead, "second");
-  assert.equal(judge([{ value: 2 }, { value: 2 }]).lead, "tie");
-  assert.equal(judge([{ value: 2 }]).lead, undefined);
-  assert.equal(judge([{ value: 1 }, { value: 2 }, { value: 3 }]).lead, undefined);
+test("ahead 는 값마다 앞섰는지를 말한다. 값이 하나이면 없다", () => {
+  const ahead = (...values) =>
+    judge(values.map((value) => ({ value }))).values.map((v) => v.ahead);
+  assert.deepEqual(ahead(3, 1), ["yes", "no"]);
+  assert.deepEqual(ahead(1, 10), ["no", "yes"]);
+  assert.deepEqual(ahead(2, 2), ["tie", "tie"]);
+  assert.deepEqual(ahead(512, 430, 58), ["yes", "no", "no"]);
+  assert.deepEqual(ahead(5, 5, 1), ["tie", "tie", "no"]);
+  assert.deepEqual(ahead(2), [undefined]);
+});
+
+test("step 은 처음, 사이, 마지막이다", () => {
+  const step = (s) => judgeFeed({ values: [{ value: 1 }], step: s }, computeFeed({ values: [{ value: 1 }] })).step;
+  assert.equal(step({ value: 1, to: 4 }), "first");
+  assert.equal(step({ value: 2, to: 4 }), "mid");
+  assert.equal(step({ value: 4, to: 4 }), "last");
+  assert.equal(step({ value: 3 }), "mid"); // 끝을 모르면 마지막이 없다
+  assert.equal(judge([{ value: 1 }]).step, undefined);
+});
+
+test("경우표는 focus 가 가리키는 값의 조건을 본다", () => {
+  const feed = {
+    values: [{ value: 3.1 }, { value: 2.9 }, { value: 3.4, to: 4 }],
+    focus: 2,
+    step: { value: 4, to: 4 },
+    state: "live",
+  };
+  const judged = judgeFeed(feed, computeFeed(feed));
+  assert.deepEqual(sceneConditions(judged), {
+    level: "high",
+    bound: "inside",
+    ahead: "yes",
+    state: "live",
+    step: "last",
+  });
 });
 
 test("state 는 피드의 것이고, 끊기면 stale 이다", () => {
@@ -95,7 +124,7 @@ test("앞의 상태가 없으면(정지 그림) 값만으로 판정한다", () =
   assert.equal(one({ value: 0.36, to: 1 }).level, "mid");
 });
 
-test("경우표는 첫째 값의 조건과 lead, state 를 본다", () => {
+test("focus 가 없으면 경우표는 첫째 값의 조건을 본다", () => {
   const judged = judge([
     { value: 9, to: 10, base: 5, rate: 0.5, rateScale: 1 },
     { value: 1, to: 10 },
@@ -107,6 +136,6 @@ test("경우표는 첫째 값의 조건과 lead, state 를 본다", () => {
     drift: "up",
     pace: "brisk",
     state: "live",
-    lead: "first",
+    ahead: "yes",
   });
 });

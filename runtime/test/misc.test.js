@@ -78,7 +78,9 @@ test("숫자는 기기 설정과 상관없이 같은 모양으로 적는다", ()
 test("값이 1개면 그 값, 2개면 맞대결, 그보다 많으면 숫자를 보여 주지 않는다", () => {
   assert.equal(numberText([{ value: 62 }]), "62");
   assert.equal(numberText([{ value: 92 }, { value: 102 }]), "92 : 102");
-  assert.equal(numberText([{ value: 1 }, { value: 2 }, { value: 3 }]), "");
+  // 값이 셋 이상이면 focus 가 가리키는 값을 보여 준다. 없으면 첫째다.
+  assert.equal(numberText([{ value: 1 }, { value: 2 }, { value: 3 }]), "1");
+  assert.equal(numberText([{ value: 1 }, { value: 2 }, { value: 3 }], 2), "3");
 });
 
 test("받는 곳: 난수와 주소에 적은 값은 검사를 거친 피드를 낸다", async () => {

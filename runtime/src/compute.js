@@ -35,8 +35,15 @@ export function computeValue(v, total = null) {
 }
 
 export function computeFeed(feed) {
+  // 값이 하나이면 견줄 것이 없어 몫도 순위도 없다.
+  const many = feed.values.length > 1;
   // 음수가 섞이거나 합이 0 이하이면 몫을 내지 않는다.
   const sum = feed.values.reduce((s, v) => s + v.value, 0);
-  const total = sum > 0 && feed.values.every((v) => v.value >= 0) ? sum : null;
-  return feed.values.map((v) => computeValue(v, total));
+  const total =
+    many && sum > 0 && feed.values.every((v) => v.value >= 0) ? sum : null;
+  return feed.values.map((v) => ({
+    ...computeValue(v, total),
+    // 순위: 1 이 가장 크다. 같은 값은 같은 순위다.
+    rank: many ? 1 + feed.values.filter((o) => o.value > v.value).length : null,
+  }));
 }

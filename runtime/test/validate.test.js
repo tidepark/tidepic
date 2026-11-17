@@ -5,7 +5,7 @@ import { parseFeed, validateFeed } from "../src/validate.js";
 const sample = {
   spec: 1,
   values: [{ value: 71200, from: 70100, to: 71900, base: 70500, rate: 45, rateScale: 150 }],
-  step: { now: 2, total: 4 },
+  step: { value: 2, to: 4 },
   state: "live",
   event: { type: "score", index: 0, at: 1794787200 },
   extra: { baseball: { inning: 7, half: "bottom", outs: 2, bases: [1, 0, 1] } },
@@ -36,11 +36,23 @@ test("values 는 64개까지다. 넘으면 잘라 쓰지 않고 버린다", () =
   assert.equal(validateFeed(many(65)).ok, false);
 });
 
+test("focus 는 values 안의 순서여야 한다", () => {
+  const feed = (focus) => ({ spec: 1, values: [{ value: 1 }, { value: 2 }, { value: 3 }], focus });
+  assert.equal(validateFeed(feed(2)).feed.focus, 2);
+  assert.equal(validateFeed(feed(0)).feed.focus, 0);
+  for (const bad of [3, -1, 1.5, "1"]) {
+    const result = validateFeed(feed(bad));
+    assert.equal(result.feed.focus, undefined);
+    assert.deepEqual(result.dropped, ["focus"]);
+  }
+});
+
 test("선택 항목이 틀리면 그 항목만 버린다. 고쳐 쓰지 않는다", () => {
   const result = validateFeed({
     spec: 1,
     values: [{ value: 5, from: "0", to: 10, rate: "fast", scale: 0, rateScale: -1, high: 10, momentum: 0.3 }],
-    step: { now: "2" },
+    step: { now: 2, total: 4 },
+    focus: 3,
     ttl: -1,
   });
   assert.equal(result.ok, true);
@@ -48,6 +60,7 @@ test("선택 항목이 틀리면 그 항목만 버린다. 고쳐 쓰지 않는�
   assert.equal(result.feed.step, undefined);
   assert.equal(result.feed.ttl, undefined);
   assert.deepEqual(result.dropped.sort(), [
+    "focus",
     "step",
     "ttl",
     "values[0].from",

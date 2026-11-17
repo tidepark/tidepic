@@ -249,7 +249,7 @@ export async function start({
       return;
     }
     shown = target.map((t, i) => {
-      const out = { raw: t.raw };
+      const out = { raw: t.raw, rank: t.rank };
       for (const name of ["fill", "over", "under", "rise", "momentum", "share"]) {
         const from = shown[i][name];
         out[name] =
@@ -300,6 +300,7 @@ export async function start({
     } else {
       draw(ctx, {
         values: shown,
+        focus: feed.focus ?? 0,
         step: feed.step,
         state,
         event: happened,
@@ -317,7 +318,7 @@ export async function start({
       height,
       title: config.title,
       titleAt,
-      number: config.num ? numberText(feed.values) : "",
+      number: config.num ? numberText(feed.values, feed.focus) : "",
       numAt,
     });
   }

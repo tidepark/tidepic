@@ -58,6 +58,13 @@ export function validateFeed(data) {
   const feed = { spec: 1, values, state: "live" };
   if (STATES.includes(data.state)) feed.state = data.state;
 
+  // 경우표와 숫자 표시가 볼 값의 순서. 없으면 첫째다.
+  if (data.focus !== undefined) {
+    const inRange =
+      Number.isInteger(data.focus) && data.focus >= 0 && data.focus < values.length;
+    if (inRange) feed.focus = data.focus;
+    else dropped.push("focus");
+  }
   if (data.step !== undefined) {
     const step = cleanStep(data.step);
     if (step) feed.step = step;
@@ -101,12 +108,13 @@ function cleanValue(v, i, dropped) {
   return out;
 }
 
+// 단계는 값과 같은 모양이다: 지금이 몇 번째(value)이고 몇 번째에서 끝나는가(to).
 function cleanStep(step) {
-  if (!isObject(step) || !isNum(step.now)) return null;
-  const out = { now: step.now };
-  if (step.total !== undefined) {
-    if (!isNum(step.total)) return null;
-    out.total = step.total;
+  if (!isObject(step) || !isNum(step.value)) return null;
+  const out = { value: step.value };
+  if (step.to !== undefined) {
+    if (!isNum(step.to)) return null;
+    out.to = step.to;
   }
   return out;
 }

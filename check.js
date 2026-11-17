@@ -158,15 +158,21 @@ function show() {
     if (c.under) row(rows, "under", c.under, false);
     row(rows, "rise", c.rise, true);
     row(rows, "momentum", c.momentum, true);
-    row(rows, "share", c.share, false);
-    card.append(rows, chips(Object.entries(judged.values[i])));
+    // 값이 하나이면 견줄 것이 없어 몫과 순위가 없다.
+    const pairs = Object.entries(judged.values[i]);
+    if (feed.values.length > 1) {
+      row(rows, "share", c.share, false);
+      pairs.push(["rank", String(c.rank)]);
+    }
+    card.append(rows, chips(pairs));
     result.append(card);
   });
 
   const whole = el("section", "card");
   whole.append(el("h2", "", t.feed));
   const pairs = [["state", judged.state]];
-  if (judged.lead) pairs.push(["lead", judged.lead]);
+  if (judged.step) pairs.push(["step", judged.step]);
+  if (feed.values.length > 2) pairs.push(["focus", String(judged.focus)]);
   const kind = t.kinds[Math.min(feed.values.length, 3) - 1];
   whole.append(el("p", "", `${t.kind}: ${kind}`), chips(pairs));
   result.append(whole, el("p", "note", t.foot));

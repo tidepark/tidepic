@@ -41,7 +41,8 @@ export const CONDITION_NAMES = {
   trend: BANDS.trend.names,
   drift: BANDS.drift.names,
   pace: BANDS.pace.names,
-  lead: ["first", "tie", "second"],
+  ahead: ["yes", "tie", "no"],
+  step: ["first", "mid", "last"],
   state: ["live", "idle", "done", "stale"],
 };
 
@@ -72,26 +73,39 @@ function judgeValue(c, prev = {}) {
   return memory;
 }
 
-// 돌려주는 것: values(값마다의 조건), lead, state, 그리고 다음 판정에 넘길 memory.
+// 단계의 조건. 처음(1 이하), 마지막(to 에 닿음), 그 사이.
+function judgeStep(step) {
+  if (step.to !== undefined && step.value >= step.to) return "last";
+  return step.value <= 1 ? "first" : "mid";
+}
+
+// 돌려주는 것: values(값마다의 조건), focus, state, step, 그리고 다음 판정에 넘길 memory.
 export function judgeFeed(feed, computed, { stale = false, memory = [] } = {}) {
   const next = computed.map((c, i) => judgeValue(c, memory[i]));
+  const tops = computed.filter((c) => c.rank === 1).length;
   const judged = {
-    values: next.map((m) =>
-      Object.fromEntries(Object.entries(m).map(([key, v]) => [key, v.name])),
-    ),
+    values: next.map((m, i) => {
+      const names = Object.fromEntries(
+        Object.entries(m).map(([key, v]) => [key, v.name]),
+      );
+      // 앞섰는가: 혼자 가장 크면 yes, 같이 가장 크면 tie. 값이 하나이면 없다.
+      const { rank } = computed[i];
+      if (rank !== null && rank !== undefined) {
+        names.ahead = rank > 1 ? "no" : tops > 1 ? "tie" : "yes";
+      }
+      return names;
+    }),
+    focus: feed.focus ?? 0,
     state: stale ? "stale" : feed.state,
     memory: next,
   };
-  if (feed.values.length === 2) {
-    const [a, b] = feed.values;
-    judged.lead = a.value > b.value ? "first" : a.value < b.value ? "second" : "tie";
-  }
+  if (feed.step) judged.step = judgeStep(feed.step);
   return judged;
 }
 
-// 경우표가 보는 조건. 값마다의 조건은 첫째 값의 것을 쓴다 (잠정. 규칙 13절).
+// 경우표가 보는 조건. 값마다의 조건은 focus 가 가리키는 값의 것을 쓴다.
 export function sceneConditions(judged) {
-  const out = { ...judged.values[0], state: judged.state };
-  if (judged.lead) out.lead = judged.lead;
+  const out = { ...judged.values[judged.focus], state: judged.state };
+  if (judged.step) out.step = judged.step;
   return out;
 }
