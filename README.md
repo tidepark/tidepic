@@ -15,7 +15,7 @@ When that number climbs, the train heads uphill. When it falls, downhill.
 
 > I started this project, and drafted the spec and wrote the code with Claude. Still rough around the edges — PRs and feedback are always welcome.
 
-A companion that follows tidepic turns changing numbers into a scene you can leave on screen. A countdown becomes petals on a flower. A step count becomes rising water. A price becomes the slope of a mountain railway.
+A companion that follows tidepic turns changing numbers into a scene you can leave on screen. A countdown becomes petals on a flower. Visitors become rain on a window. A temperature becomes the slope of a mountain railway. A scene is for reading the mood, not the exact number.
 
 This repository holds the **tidepic spec**: the data format a companion receives and the rules for packaging one.
 

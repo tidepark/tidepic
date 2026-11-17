@@ -1,6 +1,6 @@
 # tidepic
 
-> tidepic is a set of rules for showing numbers as scenery instead of charts. A sender publishes a small JSON feed. A companion (a web page) reads the feed and turns it into a scene: flowers that open, a train that climbs, windows that light up.
+> tidepic is a set of rules for showing numbers as scenery instead of charts. A sender publishes a small JSON feed. A companion (a web page) reads the feed and turns it into a scene: flowers that open, a train that climbs, windows that light up. A scene is for reading the mood of a number, not its exact value.
 
 If you are asked to connect some data to a tidepic scene, you are being asked to write a feed. If you are asked to make a new scene, you are being asked to make a companion. There is a guide for each.
 
