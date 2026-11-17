@@ -1,0 +1,60 @@
+/* tidepic.com 첫 페이지 */
+:root { --paper: #f6f0e2; --ink: #1e4d3b; --muted: #5b6f64; --line: rgba(30, 77, 59, 0.2); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { min-height: 100vh; background: var(--paper); color: var(--ink); word-break: keep-all;
+  font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; line-height: 1.6; }
+a { color: var(--ink); }
+a:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.top, main { max-width: 70rem; margin: 0 auto; padding-inline: 1.5rem; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1.25rem; }
+.mark { display: block; color: var(--ink); }
+.word { display: block; height: 2.6rem; width: auto; }
+.lang { color: var(--muted); font-size: 0.95rem; text-underline-offset: 4px; }
+.lang:hover { color: var(--ink); }
+
+main { padding-block: 2rem 4rem; }
+h1 { margin: 0; max-width: 20em; font-size: clamp(1.7rem, 4.2vw, 2.6rem); line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; }
+p { color: var(--muted); margin: 1rem 0 0; }
+
+.demo { margin: 2.5rem 0 0; }
+.lead { margin: 0; }
+pre { margin: 0.75rem 0 0; padding: 1rem 1.25rem; border: 1px solid var(--line); border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.5); white-space: pre-wrap; font-size: 0.95rem; color: var(--ink); }
+pre output { display: inline-block; min-width: 2ch; font-weight: 700; text-align: right; }
+.dial { display: flex; align-items: center; gap: 1rem; margin: 1rem 0 0; color: var(--muted); font-size: 0.95rem; }
+.dial input { flex: 1; max-width: 24rem; accent-color: var(--ink); }
+
+.views { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.views li { min-width: 0; }
+.panel { aspect-ratio: 4 / 3; border-radius: 0.9rem; overflow: hidden; border: 1px solid var(--line); background: #dfe9e2; }
+.panel iframe { display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
+.views a, .views span { display: block; margin: 0.5rem 0 0; font-size: 0.95rem; }
+.views span { color: var(--muted); }
+.views a { text-underline-offset: 4px; }
+/* 흔히 보는 숫자판. 일부러 여느 대시보드처럼 그린다. */
+.usual { display: grid; place-items: center; background: #fff; color: #1f2937; }
+.usual svg { width: 78%; height: auto; }
+.usual .track, .usual .fill { fill: none; stroke-width: 11; stroke-linecap: round; }
+.usual .track { stroke: #e5e7eb; }
+.usual .fill { stroke: #2f6fed; transition: stroke-dashoffset 0.2s; }
+.usual text { fill: currentColor; font: 700 26px system-ui, sans-serif; }
+.usual .of { fill: #6b7280; font: 400 10px system-ui, sans-serif; }
+.note { font-size: 0.95rem; }
+
+.text { max-width: 44rem; margin: 3rem 0 0; }
+.lines { color: var(--ink); font-size: 1.15rem; line-height: 1.75; margin: 0; }
+.links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 2.25rem 0 0.5rem; }
+.button { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 999px; text-decoration: none; font-weight: 500; }
+.solid { background: var(--ink); color: var(--paper); }
+.outline { border: 1px solid var(--line); }
+.button:hover { opacity: 0.85; }
+footer { margin: 3.5rem 0 0; padding: 1.25rem 0 0; border-top: 1px solid var(--line); font-size: 0.9rem; color: var(--muted); }
+footer a { color: var(--muted); }
+
+@media (max-width: 760px) {
+  .views { grid-template-columns: repeat(2, 1fr); }
+  .dial { flex-direction: column; align-items: stretch; gap: 0.4rem; }
+}
+@media (prefers-reduced-motion: reduce) { .usual .fill { transition: none; } }

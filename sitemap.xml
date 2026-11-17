@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://tidepic.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/ko.html"/>
+  </url>
+  <url>
+    <loc>https://tidepic.com/ko.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/ko.html"/>
+  </url>
+  <url>
+    <loc>https://tidepic.com/check.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/check.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/check.ko.html"/>
+  </url>
+  <url>
+    <loc>https://tidepic.com/check.ko.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/check.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/check.ko.html"/>
+  </url>
+  <url><loc>https://tidepic.com/examples/table/</loc></url>
+  <url><loc>https://tidepic.com/GUIDE.md</loc></url>
+  <url><loc>https://tidepic.com/GUIDE.ko.md</loc></url>
+  <url><loc>https://tidepic.com/COMPANION.md</loc></url>
+  <url><loc>https://tidepic.com/COMPANION.ko.md</loc></url>
+  <url><loc>https://tidepic.com/SPEC.md</loc></url>
+  <url><loc>https://tidepic.com/SPEC.ko.md</loc></url>
+  <url><loc>https://tidepic.com/llms.txt</loc></url>
+</urlset>

@@ -11,7 +11,10 @@
 </head>
 <body>
 <main>
-  <a class="home" href="ko.html">← tidepic</a>
+  <div class="bar">
+    <a class="home" href="ko.html">← tidepic</a>
+    <a class="lang" href="check.html" lang="en" hreflang="en" data-lang="en">English</a>
+  </div>
   <h1>피드 확인기</h1>
   <p>피드 JSON 을 붙여 넣으면 규칙에 맞는지, 그리고 컴패니언이 어떤 값으로 장면을 그리게 되는지 보여 줍니다.</p>
   <p>붙여 넣은 내용은 이 브라우저 안에서만 계산합니다. 어디에도 보내지 않습니다.</p>
@@ -28,9 +31,9 @@
   <div id="result" aria-live="polite"></div>
   <footer>
     계산 방법은 <a href="https://github.com/tidepark/tidepic/blob/main/SPEC.ko.md">규칙</a> 3절에 있습니다. 이 페이지가 쓰는 검사와 계산 코드는 <a href="https://github.com/tidepark/tidepic/tree/main/runtime">저장소의 runtime 폴더</a>에 있습니다. 규칙은 초안입니다.
-    <br><a href="check.html" lang="en">English</a>
   </footer>
 </main>
 <script type="module" src="check.js"></script>
+<script src="lang.js"></script>
 </body>
 </html>

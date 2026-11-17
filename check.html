@@ -11,7 +11,10 @@
 </head>
 <body>
 <main>
-  <a class="home" href="./">← tidepic</a>
+  <div class="bar">
+    <a class="home" href="./">← tidepic</a>
+    <a class="lang" href="check.ko.html" lang="ko" hreflang="ko" data-lang="ko">한국어</a>
+  </div>
   <h1>Feed checker</h1>
   <p>Paste a feed as JSON. This page tells you whether it follows the rules and shows the values a companion would draw its scene with.</p>
   <p>What you paste is computed inside this browser only. It is not sent anywhere.</p>
@@ -28,9 +31,9 @@
   <div id="result" aria-live="polite"></div>
   <footer>
     The calculations are in section 3 of the <a href="https://github.com/tidepark/tidepic/blob/main/SPEC.md">spec</a>. The checking and computing code this page uses is in the <a href="https://github.com/tidepark/tidepic/tree/main/runtime">runtime folder of the repository</a>. The rules are a draft.
-    <br><a href="check.ko.html" lang="ko">한국어</a>
   </footer>
 </main>
 <script type="module" src="check.js"></script>
+<script src="lang.js"></script>
 </body>
 </html>
