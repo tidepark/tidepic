@@ -12,7 +12,7 @@ export const LIMITS = {
   title: 40,
 };
 
-const STATES = ["live", "idle", "done"];
+const STATES = ["live", "idle", "done", "fault"];
 const FORMATS = ["number", "duration"];
 const CONTROL = /[\u0000-\u001f\u007f]/;
 const SLUG = /^[a-z0-9-]{1,64}$/;
@@ -121,6 +121,11 @@ function cleanValue(v, i, dropped) {
     if (v[key] === undefined) continue;
     if (isNum(v[key]) && v[key] > 0) out[key] = v[key];
     else dropped.push(`values[${i}].${key}`);
+  }
+  // 이 값만의 상태. 없으면 피드 전체의 것을 따른다.
+  if (v.state !== undefined) {
+    if (STATES.includes(v.state)) out.state = v.state;
+    else dropped.push(`values[${i}].state`);
   }
   // 숫자를 보여 줄 때의 단위와 형식. 보내는 쪽만 안다.
   if (v.unit !== undefined) {

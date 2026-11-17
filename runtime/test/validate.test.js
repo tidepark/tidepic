@@ -82,6 +82,17 @@ test("view 는 설정과 같은 이름만 받고, 틀린 것만 버린다", () =
   assert.equal(feed({ title: "가".repeat(41) }).feed.view, undefined);
 });
 
+test("값마다 상태를 적을 수 있고, 고장은 fault 다", () => {
+  const read = validateFeed({
+    spec: 1,
+    state: "fault",
+    values: [{ value: 1, state: "idle" }, { value: 0, state: "broken" }, { value: 1 }],
+  });
+  assert.equal(read.feed.state, "fault");
+  assert.deepEqual(read.feed.values, [{ value: 1, state: "idle" }, { value: 0 }, { value: 1 }]);
+  assert.deepEqual(read.dropped, ["values[1].state"]);
+});
+
 test("focus 는 values 안의 순서여야 한다", () => {
   const feed = (focus) => ({ spec: 1, values: [{ value: 1 }, { value: 2 }, { value: 3 }], focus });
   assert.equal(validateFeed(feed(2)).feed.focus, 2);

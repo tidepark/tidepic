@@ -54,9 +54,9 @@ test("bound 는 범위 밖인지를 말한다", () => {
 });
 
 test("판정할 수 없는 조건은 없다", () => {
-  assert.deepEqual(one({ value: 5 }), {});
-  assert.deepEqual(one({ value: 5, to: 10 }), { level: "mid", bound: "inside" });
-  assert.deepEqual(one({ value: 5, rate: 1 }), {}); // 폭이 없다
+  assert.deepEqual(one({ value: 5 }), { state: "live" });
+  assert.deepEqual(one({ value: 5, to: 10 }), { level: "mid", bound: "inside", state: "live" });
+  assert.deepEqual(one({ value: 5, rate: 1 }), { state: "live" }); // 폭이 없다
 });
 
 test("ahead 는 값마다 앞섰는지를 말한다. 값이 하나이면 없다", () => {
@@ -94,6 +94,20 @@ test("경우표는 focus 가 가리키는 값의 조건을 본다", () => {
     state: "live",
     step: "last",
   });
+});
+
+test("상태는 값마다 있고, 적지 않으면 피드 전체의 것을 따른다", () => {
+  const feed = {
+    values: [{ value: 1, to: 1 }, { value: 0, to: 1, state: "idle" }, { value: 0, to: 1, state: "fault" }],
+    state: "live",
+  };
+  const states = (options) =>
+    judgeFeed(feed, computeFeed(feed), options).values.map((v) => v.state);
+  assert.deepEqual(states(), ["live", "idle", "fault"]);
+  assert.deepEqual(states({ stale: true }), ["stale", "stale", "stale"]);
+  // 경우표는 focus 가 가리키는 값의 상태를 본다
+  const judged = judgeFeed({ ...feed, focus: 2 }, computeFeed(feed));
+  assert.equal(sceneConditions(judged).state, "fault");
 });
 
 test("state 는 피드의 것이고, 끊기면 stale 이다", () => {

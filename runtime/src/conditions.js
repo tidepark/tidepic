@@ -43,7 +43,7 @@ export const CONDITION_NAMES = {
   pace: BANDS.pace.names,
   ahead: ["yes", "tie", "no"],
   step: ["first", "mid", "last"],
-  state: ["live", "idle", "done", "stale"],
+  state: ["live", "idle", "done", "fault", "stale"],
 };
 
 // prev: { name, from }. from 은 이 띠에 들어올 때 넘은 경계의 번호다.
@@ -88,6 +88,8 @@ export function judgeFeed(feed, computed, { stale = false, memory = [] } = {}) {
       const names = Object.fromEntries(
         Object.entries(m).map(([key, v]) => [key, v.name]),
       );
+      // 상태는 값마다 있다. 소식이 끊기면 모두 stale 이다.
+      names.state = stale ? "stale" : computed[i].state;
       // 앞섰는가: 혼자 가장 크면 yes, 같이 가장 크면 tie. 값이 하나이면 없다.
       const { rank } = computed[i];
       if (rank !== null && rank !== undefined) {
@@ -103,9 +105,9 @@ export function judgeFeed(feed, computed, { stale = false, memory = [] } = {}) {
   return judged;
 }
 
-// 경우표가 보는 조건. 값마다의 조건은 focus 가 가리키는 값의 것을 쓴다.
+// 경우표가 보는 조건. focus 가 가리키는 값의 것을 쓴다. 상태도 그 값의 것이다.
 export function sceneConditions(judged) {
-  const out = { ...judged.values[judged.focus], state: judged.state };
+  const out = { ...judged.values[judged.focus] };
   if (judged.step) out.step = judged.step;
   return out;
 }

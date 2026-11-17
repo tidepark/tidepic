@@ -43,6 +43,8 @@ export function computeFeed(feed) {
     many && sum > 0 && feed.values.every((v) => v.value >= 0) ? sum : null;
   return feed.values.map((v) => ({
     ...computeValue(v, total),
+    // 값마다의 상태. 적지 않았으면 피드 전체의 것이다.
+    state: v.state ?? feed.state ?? "live",
     // 순위: 1 이 가장 크다. 같은 값은 같은 순위다.
     rank: many ? 1 + feed.values.filter((o) => o.value > v.value).length : null,
   }));

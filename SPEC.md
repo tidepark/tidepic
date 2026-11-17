@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.3 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.4 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -91,6 +91,7 @@ Each value is an object. Only `value` is required. The other fields are what the
 | `rateScale` | How large a `rate` counts as 1, in the same units | — | Usual change per minute |
 | `unit` | Text put right after the number when it is shown | ` steps` | `원` |
 | `format` | How the number is shown: `"number"` (default), or `"duration"` for seconds shown as `9:00` | — | — |
+| `state` | The state of this value alone (3.4). Without it the value follows the feed's `state` | — | — |
 
 - The range has a direction. It runs from `from` to `to`, and `to` may be the smaller number. A weight going from 78 down to 70 is `"from": 78, "to": 70`.
 - For a countdown, `value` is the days left, `from` is the total days and `to` is 0. The fill grows as the day approaches.
@@ -132,8 +133,13 @@ A step is not put in `values`, because the number of values decides the kind of 
 | Value | Meaning |
 |---|---|
 | `"live"` | In progress (market open, game on). The default |
-| `"idle"` | Resting (market closed, before the game) |
+| `"idle"` | Resting (market closed, before the game, under maintenance) |
 | `"done"` | Finished |
+| `"fault"` | Broken: a failed sensor, a failed build, a server that is down |
+
+`state` can be written on the feed and on each value. A value without one follows the feed's. One server out of ten can be under maintenance while the rest are live.
+
+A state is for a moment when the number should be read differently, whatever the subject is. How much, how fast and how well are numbers, not states.
 
 When no data arrives for a while, the runtime reports the feed as stale by itself. Senders do not set this. Other values are ignored; domain-specific states such as weather conditions belong in `extra`.
 
@@ -176,7 +182,7 @@ The runtime also turns the derived values into named conditions. Every companion
 | `pace` | `calm`, `brisk` | Size of `momentum`: below 0.3, or not |
 | `ahead` | `yes`, `tie`, `no` | Whether this value is the largest: alone, together with another, or not. Needs two or more values |
 | `step` | `first`, `mid`, `last` | `step`: 1 or less, in between, or `to` reached |
-| `state` | `live`, `idle`, `done`, `stale` | Section 3.4. `stale` is set by the runtime |
+| `state` | `live`, `idle`, `done`, `fault`, `stale` | Section 3.4. Worked out for each value. `stale` is set by the runtime |
 
 - `level`, `bound`, `trend`, `drift`, `pace` and `ahead` are worked out for each value. A case table looks at the value that `focus` points to.
 - A condition that cannot be worked out is absent. Without `base` there is no `trend`, and without `rate` there is no `drift` or `pace`.
@@ -251,12 +257,14 @@ A companion gets its feed from one of four sources. All produce the same format.
 - Inline values take the numeric fields of `values` (`from`, `to`, `base`, `scale`, `rate`, `rateScale`) under the same names. Example: `v=102&base=100&scale=5&rate=0.8&rateScale=2`. A single number applies to every value. Write `to=110,120` when they differ.
 - Addresses written before 0.2 used `low`, `high` and `momentum`. The address still reads them for now: `low` as `from`, `high` as `to`, and `momentum` as a `rate` with a `rateScale` of 1. A feed does not.
 - If more than one is given, `data` wins over `v`, and `v` over `until`.
-- A URL source must allow cross-origin requests (CORS).
+- A URL source must allow cross-origin requests (CORS). An address on another site must use `https`. The address may carry its own query string, written with `%3F` and `%26` so it does not mix with the page's.
+- When fetching a feed, the page sends no cookies and does not say where it came from.
 - A site or host may restrict which feed URLs it accepts.
 
 ### Refresh
 
 - The viewer sets the interval with `every` (seconds).
+- A feed fetched from an address is not asked for more often than every 10 seconds.
 - If the feed carries `meta.ttl`, the companion does not ask more often than that.
 
 ## 5. Companion package

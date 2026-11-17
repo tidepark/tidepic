@@ -106,6 +106,14 @@ function parseDataUrl(x, base, origins) {
     return undefined;
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
+  // 다른 곳의 피드는 https 로만 받는다. 같은 곳의 것은 페이지를 따라간다.
+  let home;
+  try {
+    home = new URL(base).origin;
+  } catch {
+    home = undefined;
+  }
+  if (url.origin !== home && url.protocol !== "https:") return undefined;
   if (origins.length && !origins.some((o) => url.href.startsWith(o))) {
     return undefined;
   }

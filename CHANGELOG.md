@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.4 — 2026-11-17
+
+- `state` can be written on each value. A value without one follows the feed's (3.1, 3.4, 3.7).
+- New state `fault` for something broken. `idle` also covers maintenance (3.4).
+- A feed address on another site must use `https`, and a feed fetched from an address is asked for at most every 10 seconds (4).
+
+- `state`를 값마다 적을 수 있다. 적지 않은 값은 피드의 것을 따른다(3.1절, 3.4절, 3.7절).
+- 고장을 뜻하는 상태 `fault`를 더했다. `idle`은 점검도 포함한다(3.4절).
+- 다른 사이트의 피드 주소는 `https`여야 하고, 주소에서 받는 피드는 10초보다 자주 묻지 않는다(4절).
+
 ## 0.2.3 — 2026-11-17
 
 - New `view`: the sender can choose the skin, the title and the number. It uses the names of the settings and only chooses among what the companion already has. An address parameter comes before it (3.10, 5, 11).

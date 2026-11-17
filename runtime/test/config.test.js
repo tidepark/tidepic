@@ -86,6 +86,13 @@ test("data 에 주소를 적으면 그 주소에서 받는다", () => {
     url: "https://tidepark.com/c/train/feed.json",
   });
   assert.deepEqual(readConfig({}, "?data=javascript:alert(1)", BASE).source, { kind: "random" });
+  // 다른 곳의 피드는 https 로만 받는다. 주소에 인자가 붙어도 된다.
+  assert.deepEqual(readConfig({}, "?data=http://feed.example.com/a.json", BASE).source, { kind: "random" });
+  assert.equal(
+    readConfig({}, "?data=https%3A%2F%2Fdomain.com%2Fapi%2Fdata.json%3Fgroup%3Dweb%26n%3D3", BASE).source.url,
+    "https://domain.com/api/data.json?group=web&n=3",
+  );
+  assert.equal(readConfig({}, "?data=feed.json", "http://localhost:5310/").source.kind, "url");
 });
 
 test("주소 인자의 data 가 설정 파일의 data 보다 먼저다", () => {

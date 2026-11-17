@@ -23,6 +23,7 @@ export { drawOverlay, numberText, formatNumber, formatValue } from "./overlay.js
 
 const FRAME_MS = 1000 / 30; // 초당 30장을 넘지 않는다 (규칙 10절)
 const EASE_SECONDS = 0.6; // 새 값의 장면으로 옮겨 가는 시간. 도착하는 값은 바꾸지 않는다
+const URL_SECONDS = 10; // 주소에서 받는 피드는 이보다 자주 묻지 않는다
 const STALE_AFTER = 3; // 이만큼 잇달아 받지 못하면 끊김(stale)으로 알린다 (잠정)
 const SLUG = /^[a-z0-9-]{1,64}$/;
 const IMAGE_FILE = /^[a-z0-9][a-z0-9._-]*\.(webp|png|jpe?g)$/;
@@ -186,7 +187,8 @@ export async function start({
     : null;
 
   const reads = isObject(companion.reads) ? companion.reads : {};
-  const count = reads.values === 2 ? 2 : reads.values === "many" ? 5 : 1;
+  // 난수로 만들 값의 개수 (잠정). 여럿을 읽는 컴패니언에는 열두 개를 준다.
+  const count = reads.values === 2 ? 2 : reads.values === "many" ? 12 : 1;
   const source = createSource(config.source, { seed, count });
   const ctx = canvas.getContext("2d");
   const startedAt = performance.now();
@@ -252,7 +254,13 @@ export async function start({
       failures = 0;
       // 난수는 네트워크를 쓰지 않으므로 1초마다 새로 만든다 (잠정).
       seconds =
-        source.kind === "random" ? 1 : Math.max(config.every, feed.meta?.ttl ?? 0);
+        source.kind === "random"
+          ? 1
+          : Math.max(
+              config.every,
+              feed.meta?.ttl ?? 0,
+              source.kind === "url" ? URL_SECONDS : 0,
+            );
     } catch (error) {
       if (mine !== round) return;
       failures += 1;
@@ -268,7 +276,7 @@ export async function start({
       return;
     }
     shown = target.map((t, i) => {
-      const out = { raw: t.raw, rank: t.rank };
+      const out = { raw: t.raw, rank: t.rank, state: t.state };
       for (const name of ["fill", "over", "under", "rise", "momentum", "share"]) {
         const from = shown[i][name];
         out[name] =
@@ -309,7 +317,11 @@ export async function start({
     ctx.save();
     if (stage) {
       stage.draw(ctx, {
-        conditions: { ...sceneConditions(judged), state },
+        // 소식이 끊기면 값마다의 상태 대신 stale 을 본다.
+        conditions: {
+          ...sceneConditions(judged),
+          ...(state === "stale" && { state }),
+        },
         values: shown,
         event: happened,
         width,
