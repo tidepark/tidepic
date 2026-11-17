@@ -54,6 +54,8 @@ Companions built with these rules are at [tidepark.com/gallery](https://tidepark
 
 To see whether a feed follows the rules and what values a companion would draw with, paste it into the [feed checker](https://tidepic.com/check.html). It uses the same runtime.
 
+For writing a feed, there is a short [guide](GUIDE.md) with examples and common mistakes. It is written so that an AI assistant can follow it too, and [`llms.txt`](llms.txt) points to it.
+
 Showing numbers as scenes is not a new idea. tidepic only writes down one set of conventions. Section 14 of the spec lists the work that came before.
 
 ## License
