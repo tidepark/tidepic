@@ -48,7 +48,7 @@ The runtime is a draft like the spec and changes with it. The companions on tide
 
 ## Status
 
-Draft 0.1. The spec will be fixed at 1.0 after the first official companions are built against it.
+A draft. The current version is at the top of the spec. The spec will be fixed at 1.0 after the first official companions are built against it.
 
 Companions built with these rules are at [tidepark.com/gallery](https://tidepark.com/gallery).
 

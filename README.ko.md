@@ -37,7 +37,7 @@ tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규�
 
 ## 실행기와 본보기
 
-이 저장소에는 규칙이 적은 것을 실제로 돌리는 실행기도 있다.
+이 저장소에는 규칙에 적힌 것을 실제로 돌리는 실행기(런타임)도 있다.
 
 - [`runtime/`](runtime)은 피드를 읽어 검사하고, 값을 계산하고, 조건을 판정하고, 컴패니언을 튼다. 컴패니언은 그림 몇 장과 경우표로 만든 것일 수도 있고, 직접 짠 그리기 코드일 수도 있다. 빌드 없이 쓰는 자바스크립트 모듈이고 다른 것에 기대지 않는다. Lottie 파일을 트는 것만 예외여서, `lottie-web` 꾸러미와 번들러가 있어야 한다.
 - [`examples/table/`](examples/table)은 경우표와 그림 몇 장으로 만든 컴패니언이다. 그리기 코드가 없다. [tidepic.com/examples/table/](https://tidepic.com/examples/table/)에서 돌고 있다. 주소 끝에 `?v=20&to=100&num=1`을 붙이면 숫자를 줄 수 있다.
@@ -48,7 +48,7 @@ tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규�
 
 ## 상태
 
-초안 0.1 이다. 첫 공식 컴패니언들을 이 규칙에 맞춰 만든 뒤 1.0 으로 확정한다.
+초안이다. 지금 판은 규칙 첫머리에 있다. 첫 공식 컴패니언들을 이 규칙에 맞춰 만든 뒤 1.0 으로 확정한다.
 
 이 규칙으로 만든 컴패니언은 [tidepark.com/gallery](https://tidepark.com/ko/gallery)에서 볼 수 있다.
 

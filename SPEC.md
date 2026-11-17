@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.4 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.5 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -38,9 +38,9 @@ People have been showing numbers as scenes instead of charts for a long time (se
   ],
   "step":  { "value": 2, "to": 4 },
   "state": "live",
-  "event": { "type": "score", "index": 1, "at": 1794787200 },
+  "event": { "type": "score", "index": 0, "at": 1794787200 },
   "extra": { "baseball": { "inning": 7, "outs": 2 } },
-  "view":  { "title": "Seoul", "num": true },
+  "view":  { "title": "Price", "num": true },
   "meta":  { "ttl": 60 }
 }
 ```
@@ -98,7 +98,7 @@ Each value is an object. Only `value` is required. The other fields are what the
 
 ### 3.2 Derived values
 
-A companion draws from these, not from the raw numbers. Each one is (a number − an origin) ÷ a span. The sender sends the raw numbers and the runtime does the dividing.
+A companion draws from these, not from the raw numbers. Each one except `rank` is (a number − an origin) ÷ a span. The sender sends the raw numbers and the runtime does the dividing.
 
 | Name | Range | How | Needs |
 |---|---|---|---|
@@ -113,7 +113,7 @@ A companion draws from these, not from the raw numbers. Each one is (a number �
 - `fill` is clamped to 0…1. What falls outside goes to `over` and `under`. 132 against a goal of 100 gives `fill` 1 and `over` 0.32.
 - The span for `rise` is `scale` if sent, otherwise the size of the range (`to` − `from`). Results are clamped to −1…1. This rule is provisional (see section 13).
 - Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the rate of change (`rate`). The unit of time is the sender's choice, as long as `rate` and `rateScale` use the same one.
-- A missing `from` counts as 0. When the numbers a value needs are missing, the value is absent: no `fill` without `to`, no `rise` without `base` or a span, no `momentum` without `rate` or `rateScale`. Section 9 says when the runtime gives notice.
+- A missing `from` counts as 0. When the numbers a value needs are missing, the value is absent: no `fill` without `to` or when `to` equals `from`, no `rise` without `base` or a span, no `momentum` without `rate` or `rateScale`. Section 9 says when the runtime gives notice.
 - `share` is for comparing numbers that have no upper end, such as scores. 1 against 10 gives 0.09 and 0.91. If any value is negative or the sum is 0, there is no `share`.
 - `rank` is the order by size. The largest value is 1, and equal values share a rank. With a single value there is nothing to compare, so there is no `share` and no `rank`.
 - The runtime may ease the scene into place when a new value arrives. It does not change the value it arrives at. A still image always shows the arrived value.
@@ -141,7 +141,9 @@ A step is not put in `values`, because the number of values decides the kind of 
 
 A state is for a moment when the number should be read differently, whatever the subject is. How much, how fast and how well are numbers, not states.
 
-When no data arrives for a while, the runtime reports the feed as stale by itself. Senders do not set this. Other values are ignored; domain-specific states such as weather conditions belong in `extra`.
+When no data arrives for a while, the runtime reports the feed as stale by itself. Senders do not set this.
+
+A `state` that is not in the table is ignored. Domain-specific states such as weather conditions belong in `extra`.
 
 ### 3.5 `event`
 
@@ -150,9 +152,10 @@ When no data arrives for a while, the runtime reports the feed as stale by itsel
 ```
 
 - A moment such as a goal scored or a target reached. The scene reacts once.
-- `type` is a short lowercase word. Companions ignore types they do not know.
+- `type` is a short word in lowercase a–z. Companions ignore types they do not know.
 - `index` says which value it concerns (position in `values`, from 0).
 - `at` is a Unix time in seconds. A new `at` means a new event; the same `at` is reacted to only once.
+- `type` and `at` are required. `index` is optional. An event that is already there when the screen first opens counts as past, and the scene does not react to it.
 
 ### 3.6 `extra`
 
@@ -160,7 +163,7 @@ When no data arrives for a while, the runtime reports the feed as stale by itsel
 "extra": { "baseball": { "inning": 7, "half": "bottom", "outs": 2, "bases": [1, 0, 1] } }
 ```
 
-- Grouped by domain name, in lowercase.
+- Grouped by domain name, in lowercase a–z.
 - The runtime passes `extra` through untouched. Interpreting it is up to the companion.
 - A companion declares which domains it reads (section 6).
 - Without `extra`, a companion draws from the common fields alone.
@@ -181,14 +184,14 @@ The runtime also turns the derived values into named conditions. Every companion
 | `drift` | `down`, `still`, `up` | `momentum`: below −0.1, in between, above 0.1 |
 | `pace` | `calm`, `brisk` | Size of `momentum`: below 0.3, or not |
 | `ahead` | `yes`, `tie`, `no` | Whether this value is the largest: alone, together with another, or not. Needs two or more values |
-| `step` | `first`, `mid`, `last` | `step`: 1 or less, in between, or `to` reached |
+| `step` | `first`, `mid`, `last` | `step`: 1 or less, in between, or `to` reached. If both hold, `last` |
 | `state` | `live`, `idle`, `done`, `fault`, `stale` | Section 3.4. Worked out for each value. `stale` is set by the runtime |
 
-- `level`, `bound`, `trend`, `drift`, `pace` and `ahead` are worked out for each value. A case table looks at the value that `focus` points to.
-- A condition that cannot be worked out is absent. Without `base` there is no `trend`, and without `rate` there is no `drift` or `pace`.
+- `level`, `bound`, `trend`, `drift`, `pace`, `ahead` and `state` are worked out for each value. A case table looks at the value that `focus` points to.
+- A condition that cannot be worked out is absent. Without `base` there is no `trend`, and without `rate` or `rateScale` there is no `drift` or `pace`.
 - `level` stays `full` when the value passes `to`. `bound` tells the two apart.
 - **No flicker at the edges.** Once a condition changes, the value must move a further 0.03 past the boundary before it changes back. This holding applies only while a screen keeps updating. A still image, and the first frame of a screen, are judged from the boundaries alone with no previous state. So a still image of the same feed is always the same.
-- **Conditions pick the scene; derived values fine-tune it.** The derived values stay available for speed and amount, so 62% and 68% need not look identical.
+- **Conditions pick the scene; derived values fine-tune it.** The derived values stay available for speed and amount, so 40% and 60% need not look identical.
 - The boundaries above are provisional (section 13).
 
 ### 3.8 Limits
@@ -226,7 +229,7 @@ Information about the feed itself, not about the scene.
 "view": { "skin": "night", "title": "Seoul", "titleAt": "tl", "num": true, "numAt": "br" }
 ```
 
-The sender's choices about display. The names and meanings are those of the settings in section 5.
+The sender's choices about display. The names and meanings are those of the settings in section 5, and the form of each value is in the table below.
 
 | Field | Meaning |
 |---|---|
@@ -263,13 +266,14 @@ A companion gets its feed from one of four sources. All produce the same format.
 
 ### Refresh
 
-- The viewer sets the interval with `every` (seconds).
+- The viewer sets the interval with `every` (seconds). The default is 60, and it can be from 1 to 86400.
+- Random values are made afresh every second, whatever `every` is (provisional).
 - A feed fetched from an address is not asked for more often than every 10 seconds.
 - If the feed carries `meta.ttl`, the companion does not ask more often than that.
 
 ## 5. Companion package
 
-A companion is a static bundle. It needs no server and can be hosted anywhere or packed inside an app.
+A companion is a static bundle. It needs no server. It can be hosted wherever static files can be, or packed inside an app.
 
 ```
 index.html              entry point
@@ -307,7 +311,7 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | Setting | Meaning | In the address |
 |---|---|---|
 | `data` | `random`, or a feed URL | yes |
-| `every` | Refresh interval in seconds | yes |
+| `every` | Refresh interval in seconds. Default 60 | yes |
 | `skin` | Skin slug. Falls back to the default skin | yes |
 | `seed` | Seed for random numbers | yes |
 | `title` | Text shown as a title. Empty hides it (default) | yes |
@@ -317,12 +321,13 @@ A companion is, in the end, a table of cases: when the values are in this condit
 | `v`, `from`, `to`, `base`, `scale`, `rate`, `rateScale` | Inline values (4) | yes |
 | `until`, `since` | The date to count down to, and the day counting started | yes |
 | `assets` | Where skin images are loaded from | no — config file only |
+| `dataOrigins` | A list of beginnings of feed URLs that are accepted. Without it there is no restriction | no — config file only |
 
 Order of precedence: address parameters, then the feed's `view` (3.10), then the config file, then built-in defaults. Whoever put the companion on a screen comes before whoever sends the data.
 
 ### Title and number
 
-A viewer may switch on a title and the number. Both are off by default, so a companion shows the scene alone.
+A viewer or the sender may switch on a title and the number. Both are off by default, so a companion shows the scene alone.
 
 Positions use a nine-cell grid:
 
@@ -337,7 +342,7 @@ bl  bc  br
 - With one value the number is that value. With two it is shown as `92 : 102`. With more, it is the value that `focus` points to.
 - The sender can say how the number reads. `unit` is put right after it, as in `13.3°C` or `71,200원`. Put a space at the start of the unit if one is wanted. With `"format": "duration"` a number of seconds is shown as `9:00` or `4:20:00`.
 - If both land in the same cell, the title sits above the number.
-- A skin may suggest positions that suit its artwork (`"overlay": { "titleAt": "tc", "numAt": "bc" }` in `skin.json`). The viewer's choice wins.
+- A skin may suggest positions that suit its artwork (`"overlay": { "titleAt": "tc", "numAt": "bc" }` in `skin.json` or `scenes.json`). A choice by the viewer or the sender wins.
 
 ## 6. `companion.json`
 
@@ -351,7 +356,7 @@ bl  bc  br
   "still": true,
   "reads": {
     "values": 2,
-    "needs": ["fill"],
+    "needs": ["share"],
     "step": false,
     "events": ["score"],
     "extra": ["baseball"]
@@ -362,7 +367,7 @@ bl  bc  br
 
 | Field | Meaning |
 |---|---|
-| `slug` | Lowercase name used in addresses |
+| `slug` | Name used in addresses: lowercase a–z, digits and hyphens |
 | `name` | Display name, in English and Korean |
 | `spec` | Feed version it understands |
 | `made` | `"table"` or `"code"` (section 5) |
@@ -446,7 +451,7 @@ The keys under `images` and `layout` are defined by each companion.
 
 | | Basic | Free |
 |---|---|---|
-| Drawing | A case table, or 2D canvas code in its own file | Anything: 3D, WebAssembly, physics engines |
+| Drawing | A case table, or 2D canvas code in its own file | Not restricted, e.g. 3D, WebAssembly, physics engines |
 | Still image | Yes | Optional |
 | Packed inside a host app | Yes | No — loaded by address only |
 | Must follow | This whole document | Sections 3–6, 9, 11, and the display rules marked "all grades" |
@@ -460,7 +465,7 @@ A companion made as a case table has no drawing code; the runtime shows its scen
 
 ```js
 draw(ctx, {
-  values,   // [{ fill, over, under, rise, momentum, share, rank, raw }]
+  values,   // [{ fill, over, under, rise, momentum, share, rank, state, raw }]
   focus,    // which value the case table and the number look at
   step, state, event, extra,
   skin,     // images and layout numbers
@@ -496,14 +501,14 @@ A warning never blanks the screen. The companion draws what it can.
 | The scene itself contains no text. Title and number come only from the runtime (section 5) | all |
 | Pauses when the tab is hidden | all |
 | At most 30 frames per second | all |
-| Network requests only for the feed and skin images | all |
+| Network requests only for the feed and the files of its own package (config, and a skin's images, video and case table) | all |
 
 | Size | Limit |
 |---|---|
 | A skin loaded by address, images only | 3 MB |
 | A skin loaded by address, with video | 20 MB |
 | A skin packed inside a host app | 200 KB, no video |
-| One image | 2400 px on the long side, WebP |
+| One image | 2400 px on the long side. WebP is suggested (PNG and JPEG also work) |
 | One video | 1920 px on the long side, 10 seconds, no sound, loops without a visible seam |
 
 ## 11. Safety
@@ -521,7 +526,7 @@ A warning never blanks the screen. The companion draws what it can.
 
 - `spec` in a feed is the major version. It changes only when old feeds would stop working.
 - New optional fields may be added without changing `spec`. Companions ignore fields they do not know.
-- This document carries its own version (0.1.x while in draft).
+- This document carries its own version (0.x while in draft).
 
 ## 13. Open questions
 
@@ -544,5 +549,3 @@ People have long tried to show numbers as scenes or objects instead of charts. t
 - Formats that describe motion graphics as JSON (Lottie). These now also have state machines that take numbers from code and change the picture
 
 tidepic covers less than these. It does not say how a picture is drawn. The work above already does that, and a companion uses it as it is: canvas code, a few images, or a Lottie file. tidepic writes down what shape the numbers arrive in and how they connect to a scene.
-
-tidepic defines only two things: a feed that carries numbers in one shape, and a way to package a companion that turns those numbers into a scene.

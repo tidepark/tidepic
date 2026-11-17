@@ -54,11 +54,11 @@ const TEXT = {
       "no-scale": (where) => `${where}: base is there, but with no scale and no range (from, to) rise cannot be computed.`,
       "no-rate-scale": (where) => `${where}: rate is there, but with no rateScale momentum cannot be computed.`,
     },
-    kinds: ["Fill or rise (1 value)", "Head to head (2 values)", "Group (many values)"],
+    kinds: ["Fill or rise (1 value)", "Versus (2 values)", "Group (many values)"],
     kind: "Kind of scene",
     value: (i) => `Value ${i}`,
     none: {
-      fill: "None. It needs to.",
+      fill: 'None. It needs the field "to".',
       rise: "None. It needs base and a span (scale, or a range).",
       momentum: "None. It needs rate and rateScale.",
       share: "None. A value is negative or the sum is 0.",

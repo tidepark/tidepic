@@ -217,7 +217,9 @@ export async function start({
       for (const name of result.dropped) {
         notify("warn", `dropped-${name}`, `형식이 맞지 않아 버렸다: ${name}`);
       }
-      view = resolveView(config, feed.view);
+      // 꾸러미에 없는 스킨 이름은 쓰지 않는다. 그때는 설정 파일의 스킨이 그대로다.
+      const known = Array.isArray(companion.skins) && companion.skins.includes(feed.view?.skin);
+      view = resolveView(config, known ? feed.view : { ...feed.view, skin: undefined });
       // 다른 스킨을 고르면 바꾼다. 꾸러미에 없는 이름이면 pickSkin 이 기본 스킨을 고른다.
       const wanted = pickSkin(companion, { ...config, skin: view.skin }, base)?.slug ?? "";
       if (wanted !== skin.slug) {

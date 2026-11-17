@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.5 — 2026-11-17
+
+A read-through after eight versions in one day. The text now matches the runtime. No rule changed.
+
+- The example feed in section 3 pointed its event at a value that was not there. The companion example asked for `fill` on scores that have no range.
+- Things the runtime already did and the text did not say: which fields of `event` are required and that an event in the first feed counts as past (3.5), `state` among what is worked out for each value (3.7, 8), the default and range of `every`, random values every second (4), the `dataOrigins` setting (5), where a skin's suggested positions are read from (5).
+- Wording: the example for fine-tuning within one condition, "0.x while in draft", what a companion may fetch (10), "not restricted" in place of "anything" (8). The last sentence of section 14 repeated the one before it and is gone.
+
+하루에 판이 여덟 번 바뀐 뒤 처음부터 끝까지 읽고 맞췄다. 글이 실행기와 같아졌다. 규칙은 바뀌지 않았다.
+
+- 3절의 예시 피드가 없는 값을 가리키는 사건을 싣고 있었다. 꾸러미 예시는 범위가 없는 점수에 `fill`이 필요하다고 적혀 있었다.
+- 실행기가 이미 하던 일인데 글에 없던 것: `event`에서 꼭 있어야 하는 항목과 처음 받은 피드의 사건은 지난 일로 본다는 것(3.5절), 값마다 판정하는 것에 `state`(3.7절, 8절), `every`의 기본값과 범위, 난수는 1초마다(4절), `dataOrigins` 설정(5절), 스킨이 권하는 위치를 어디서 읽는지(5절).
+- 문장: 한 조건 안에서 미세하게 달라지는 예, 「초안 동안은 0.x」, 컴패니언이 받아 올 수 있는 것(10절), 「무엇이든」 대신 「정해 두지 않는다」(8절). 14절의 마지막 문장은 앞 문장을 되풀이해서 지웠다.
+
 ## 0.2.4 — 2026-11-17
 
 - `state` can be written on each value. A value without one follows the feed's (3.1, 3.4, 3.7).
