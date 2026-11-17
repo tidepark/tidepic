@@ -4,6 +4,8 @@ A guide for AI assistants and for people. [한국어](GUIDE.ko.md) · [The spec]
 
 A feed is one JSON object. A companion reads it and draws a scene. This guide covers what most feeds need. The [spec](SPEC.md) has the rest and is the one to follow when the two differ.
 
+> **If you want an AI assistant to write the feed for you**, give it the address of this page and say what you want to show. For example: "Read https://tidepic.com/GUIDE.md and write a tidepic feed for my daily steps, with a goal of 10,000."
+
 ## 1. The smallest feed
 
 ```json
