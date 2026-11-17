@@ -103,6 +103,7 @@ export function draw(ctx, { values, state, skin, width, height, time }) {
 - **Draw from the derived values**, not from the raw numbers. A value that cannot be worked out is `null`. `fill` is `null` when the feed gave no range, so decide what to draw then.
 - **The same input gives the same picture.** Do not use `Math.random`. For variety, use a number worked out from the index, such as `frac(sin(i * 127.1 + k * 311.7) * 43758.5453)`.
 - **Motion is a function of `time`** (seconds). Wind, blinking and drifting clouds are all worked out from `time` alone.
+- **Do not multiply a speed by a value.** The position of something that moves is `speed × time`, and `time` is all the time that has passed. If the speed depends on a value, a small drop in that value shrinks the whole distance travelled so far, and the thing runs backwards or jumps. Give each piece its own fixed speed, and let values change how many pieces there are, how large, how long and how strong. To make a larger value look faster, give the pieces that appear only at larger values a higher speed.
 - The runtime eases a value into place when a new one arrives. The drawing code draws what it is given.
 - `state` is the state of the whole feed, and `"stale"` means no news is arriving. Each value also has its own `state`.
 - `skin.images.<name>` are the skin's images, already loaded. `skin.layout` holds the skin's numbers and the options a viewer chose.
@@ -164,6 +165,7 @@ Serve this repository with any static file server and open the companion's folde
 - With 1, 3, 12 and 64 values if it reads many.
 - At a small card size and on a tall screen.
 - Change a value a little and look at before and after side by side. Nothing should jump to another place.
+- Watch it for a while with values that keep changing (random numbers do this). Some faults show only then, such as rain running upwards.
 - The browser console shows what the runtime dropped or could not work out.
 
 ## 9. Rules a companion keeps
