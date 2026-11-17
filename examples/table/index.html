@@ -22,6 +22,11 @@
   </head>
   <body>
     <canvas id="scene"></canvas>
+    <!-- This page has no build step, so the runtime's import of the Lottie player is pointed at a local copy.
+         이 페이지에는 묶는 단계가 없어서, 런타임이 부르는 Lottie 재생기를 저장소 안의 사본으로 이어 준다. -->
+    <script type="importmap">
+      { "imports": { "lottie-web/build/player/lottie_light_canvas.js": "../vendor/lottie_light_canvas.js" } }
+    </script>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

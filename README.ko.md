@@ -41,7 +41,7 @@ tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규�
 
 - [`runtime/`](runtime)은 피드를 읽어 검사하고, 값을 계산하고, 조건을 판정하고, 컴패니언을 튼다. 컴패니언은 그림 몇 장과 경우표로 만든 것일 수도 있고, 직접 짠 그리기 코드일 수도 있다. 빌드 없이 쓰는 자바스크립트 모듈이고 다른 것에 기대지 않는다. Lottie 파일을 트는 것만 예외여서, `lottie-web` 꾸러미와 번들러가 있어야 한다.
 - [`examples/table/`](examples/table)은 경우표와 그림 몇 장으로 만든 컴패니언이다. 그리기 코드가 없다. [tidepic.com/examples/table/](https://tidepic.com/examples/table/)에서 돌고 있다. 주소 끝에 `?v=20&to=100&num=1`을 붙이면 숫자를 줄 수 있다.
-- 직접 만들려면 `examples/table/`을 복사해 그림을 바꾸고 `scenes.json`을 고친다. 정적 파일 서버 아무것으로나 그 폴더를 열면 된다.
+- 직접 만들려면 `examples/table/`을 복사해 그림을 바꾸고 `scenes.json`을 고친다. 정적 파일 서버 아무것으로나 그 폴더를 열면 된다. 스킨이 Lottie 파일을 보여 준다면 `examples/vendor/`를 옆에 같이 둔다. 페이지가 Lottie 재생기를 거기서 받는다([lottie-web](https://github.com/airbnb/lottie-web), MIT).
 - `npm test`로 실행기의 테스트를 돌린다.
 
 실행기도 규칙처럼 초안이고 규칙과 함께 바뀐다. tidepark.com 의 컴패니언은 이 저장소에 없다.

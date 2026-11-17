@@ -41,7 +41,7 @@ The repository also holds the runtime that plays what the spec describes.
 
 - [`runtime/`](runtime) reads a feed, checks it, computes the values, judges the conditions, and plays a companion. A companion can be a case table with a few pictures, or drawing code of your own. It is plain JavaScript modules with no build step and no dependencies. Playing a Lottie file is the one exception: it needs the `lottie-web` package and a bundler.
 - [`examples/table/`](examples/table) is a companion made with a case table and a few pictures. It has no drawing code. It runs at [tidepic.com/examples/table/](https://tidepic.com/examples/table/). Add `?v=20&to=100&num=1` to the address to give it a number.
-- To make your own, copy `examples/table/`, replace the pictures, and edit `scenes.json`. Serve the folder with any static file server.
+- To make your own, copy `examples/table/`, replace the pictures, and edit `scenes.json`. Serve the folder with any static file server. If a skin shows a Lottie file, keep `examples/vendor/` next to it: the page loads the Lottie player from there ([lottie-web](https://github.com/airbnb/lottie-web), MIT).
 - `npm test` runs the runtime's tests.
 
 The runtime is a draft like the spec and changes with it. The companions on tidepark.com are not in this repository.
