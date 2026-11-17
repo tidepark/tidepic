@@ -115,6 +115,15 @@ function row(rows, name, value, signed) {
   rows.append(el("span", "num", round(value)), meter(value, signed));
 }
 
+// 초 단위 유닉스 시각을 보는 기기의 시간대로 풀어 쓴다. 날짜가 될 수 없는 수는 그대로 둔다.
+function dateText(seconds) {
+  const date = new Date(seconds * 1000);
+  if (Number.isNaN(date.getTime())) return "?";
+  const pad = (n) => String(n).padStart(2, "0");
+  const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return `${day} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 function chips(pairs) {
   const box = el("div", "chips");
   for (const [key, name] of pairs) {
@@ -181,7 +190,11 @@ function show() {
     whole.append(chips(Object.entries(feed.view).map(([key, value]) => [`view.${key}`, String(value)])));
   }
   if (feed.meta) {
-    whole.append(chips(Object.entries(feed.meta).map(([key, value]) => [key, String(value)])));
+    const pairs = Object.entries(feed.meta).map(([key, value]) => [
+      key,
+      key === "at" ? `${value} · ${dateText(value)}` : String(value),
+    ]);
+    whole.append(chips(pairs));
   }
   result.append(whole, el("p", "note", t.foot));
 }
