@@ -108,3 +108,24 @@ test("받는 곳: 주소에서 받은 피드도 검사한다", async () => {
   assert.equal((await from(reply("no", { status: 404 }))).ok, false);
   assert.equal((await from(reply(" ".repeat(20000)))).ok, false);
 });
+
+test("난수는 지난 값도 같은 물결에서 낸다. 지난 시각의 값과 같다", () => {
+  const now = randomFeed({ seed: "tide", count: 2, time: 300 });
+  const [v] = now.values;
+  assert.equal(v.history.length, 24);
+  assert.equal(v.every, 10);
+  // 맨 끝은 10초 전, 맨 앞은 240초 전의 값이다
+  assert.equal(v.history.at(-1), randomFeed({ seed: "tide", count: 2, time: 290 }).values[0].value);
+  assert.equal(v.history[0], randomFeed({ seed: "tide", count: 2, time: 60 }).values[0].value);
+  assert.ok(validateFeed(now).ok);
+  assert.deepEqual(validateFeed(now).dropped, []);
+});
+
+test("점검: 범위 없는 history 는 알리고, history 가 필요한데 없으면 경고한다", () => {
+  const codes = (v) => checkFeed({ values: [v] }).map((n) => n.code);
+  assert.deepEqual(codes({ value: 5, history: [1, 2] }), ["history-no-range"]);
+  assert.deepEqual(codes({ value: 5, to: 10, history: [1, 2] }), []);
+  const feed = { values: [{ value: 5, to: 10 }] };
+  const notices = checkReads({ needs: ["history"] }, feed, computeFeed(feed));
+  assert.deepEqual(notices.map((n) => n.code), ["needs-history"]);
+});

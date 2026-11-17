@@ -9,6 +9,7 @@ export const LIMITS = {
   extraBytes: 4 * 1024,
   text: 64,
   unit: 8,
+  history: 60,
   title: 40,
 };
 
@@ -116,11 +117,21 @@ function cleanValue(v, i, dropped) {
     if (isNum(v[key])) out[key] = v[key];
     else dropped.push(`values[${i}].${key}`);
   }
-  // 폭: 0 보다 커야 한다.
-  for (const key of ["scale", "rateScale"]) {
+  // 폭과 간격: 0 보다 커야 한다.
+  for (const key of ["scale", "rateScale", "every"]) {
     if (v[key] === undefined) continue;
     if (isNum(v[key]) && v[key] > 0) out[key] = v[key];
     else dropped.push(`values[${i}].${key}`);
+  }
+  // 지난 값들. 오래된 것부터이고, 하나라도 틀리면 줄 전체를 버린다.
+  if (v.history !== undefined) {
+    const ok =
+      Array.isArray(v.history) &&
+      v.history.length >= 1 &&
+      v.history.length <= LIMITS.history &&
+      v.history.every(isNum);
+    if (ok) out.history = [...v.history];
+    else dropped.push(`values[${i}].history`);
   }
   // 이 값만의 상태. 없으면 피드 전체의 것을 따른다.
   if (v.state !== undefined) {

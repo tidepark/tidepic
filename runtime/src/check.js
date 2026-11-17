@@ -22,6 +22,14 @@ export function checkFeed(feed) {
         message: `values[${i}]: rate 가 있는데 rateScale 이 없어 momentum 을 계산할 수 없다`,
       });
     }
+    if (v.history !== undefined && !ranged) {
+      notices.push({
+        level: "info",
+        code: "history-no-range",
+        where: `values[${i}]`,
+        message: `values[${i}]: history 가 있는데 범위가 없어 줄 안의 최소와 최대에 맞춘다. 값이 올 때마다 모양이 달라질 수 있다`,
+      });
+    }
   });
   return notices;
 }
@@ -45,6 +53,7 @@ export function checkReads(reads, feed, computed) {
     rise: "rise 를 계산할 수 없다 (base 나 폭이 없다)",
     momentum: "momentum 을 계산할 수 없다 (rate 나 rateScale 이 없다)",
     share: "share 를 계산할 수 없다 (음수가 있거나 합이 0 이다)",
+    history: "history 가 오지 않았다",
   };
   for (const [name, message] of Object.entries(why)) {
     if (needs.includes(name) && computed.some((c) => c[name] === null)) {

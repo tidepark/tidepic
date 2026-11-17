@@ -94,3 +94,24 @@ test("원래 값은 raw 로 그대로 넘긴다", () => {
   const v = { value: 5, to: 10 };
   assert.equal(computeValue(v).raw, v);
 });
+
+test("history 는 지난 값들과 지금 값을 차례로 fill 과 같은 식으로 바꾼 줄이다", () => {
+  const c = computeValue({ value: 6200, to: 10000, history: [4100, 5000, 12000, -50] });
+  assert.equal(c.history.length, 5);
+  near(c.history[0], 0.41);
+  near(c.history[1], 0.5);
+  assert.equal(c.history[2], 1); // 범위 밖은 자른다
+  assert.equal(c.history[3], 0);
+  near(c.history[4], c.fill); // 마지막은 지금 값이다
+  // 줄어드는 범위에서도 같은 식이다
+  near(computeValue({ value: 72, from: 78, to: 70, history: [78, 74] }).history[1], 0.5);
+});
+
+test("범위가 없으면 history 는 줄 안의 가장 작은 값과 큰 값에 맞춘다", () => {
+  assert.deepEqual(computeValue({ value: 30, history: [10, 20] }).history, [0, 0.5, 1]);
+  assert.deepEqual(computeValue({ value: 7, history: [7, 7] }).history, [0.5, 0.5, 0.5]);
+});
+
+test("history 가 오지 않으면 없다", () => {
+  assert.equal(computeValue({ value: 5, to: 10 }).history, null);
+});

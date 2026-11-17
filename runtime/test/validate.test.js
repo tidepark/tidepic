@@ -213,3 +213,29 @@ test("parseFeed 는 크기와 JSON 형식을 먼저 본다", () => {
   const big = JSON.stringify({ spec: 1, values: [{ value: 1 }], pad: "x".repeat(17000) });
   assert.equal(parseFeed(big).ok, false);
 });
+
+test("history 는 숫자의 줄이고 every 는 0 보다 큰 수다. 틀리면 그 항목만 버린다", () => {
+  const good = validateFeed({
+    spec: 1,
+    values: [{ value: 6200, to: 10000, history: [4100, 4800, 5200], every: 3600 }],
+  });
+  assert.deepEqual(good.feed.values[0].history, [4100, 4800, 5200]);
+  assert.equal(good.feed.values[0].every, 3600);
+  assert.deepEqual(good.dropped, []);
+
+  const bad = (history, every) =>
+    validateFeed({ spec: 1, values: [{ value: 1, history, every }] });
+  assert.deepEqual(bad([1, "2", 3], 0).dropped, ["values[0].every", "values[0].history"]);
+  assert.equal(bad([1, "2", 3], 0).feed.values[0].history, undefined);
+  assert.deepEqual(bad([], 60).dropped, ["values[0].history"]);
+  assert.deepEqual(bad("1,2,3", 60).dropped, ["values[0].history"]);
+  assert.deepEqual(bad([1, Infinity], 60).dropped, ["values[0].history"]);
+});
+
+test("history 는 값 하나에 60개까지다. 넘으면 줄 전체를 버린다", () => {
+  const line = (n) => Array.from({ length: n }, (_, i) => i);
+  const at = (n) => validateFeed({ spec: 1, values: [{ value: 1, history: line(n) }] });
+  assert.equal(at(60).feed.values[0].history.length, 60);
+  assert.equal(at(61).feed.values[0].history, undefined);
+  assert.deepEqual(at(61).dropped, ["values[0].history"]);
+});

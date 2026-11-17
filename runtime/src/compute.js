@@ -1,7 +1,19 @@
 // 계산되는 값 (규칙 3.2절). 컴패니언은 원래 숫자가 아니라 이 값으로 그린다.
 // 모두 (숫자 − 원점) ÷ 폭 이다. 피드 한 장만으로 정한다. 지난 피드를 기억해 값을 만들지 않는다.
+// 지난 값은 보내는 쪽이 history 에 담아 보낸 것만 쓴다.
 
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+
+// 지난 값들과 지금 값을 차례로 0~1 로 바꾼 줄. 범위가 있으면 fill 과 같은 식이고,
+// 없으면 줄 안의 가장 작은 값과 가장 큰 값에 맞춘다.
+function computeHistory(v, from, span) {
+  if (!v.history) return null;
+  const points = [...v.history, v.value];
+  if (span !== 0) return points.map((x) => clamp((x - from) / span, 0, 1));
+  const lo = Math.min(...points);
+  const hi = Math.max(...points);
+  return points.map((x) => (hi > lo ? (x - lo) / (hi - lo) : 0.5));
+}
 
 // total: 값들의 합. 몫을 낼 수 없으면 null 이다.
 export function computeValue(v, total = null) {
@@ -29,6 +41,7 @@ export function computeValue(v, total = null) {
     under: along === null ? null : clamp(-along, 0, 1), // from 에 못 미친 만큼
     rise,
     momentum,
+    history: computeHistory(v, from, span),
     share: total === null ? null : v.value / total,
     raw: v,
   };

@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.6 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.7 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -26,7 +26,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
 2. **Senders send raw numbers.** Scaling to 0–1 is the runtime's job.
 3. **Common fields are always enough to draw.** Domain-specific data (`extra`) only enriches the scene.
 4. **Unknown fields are ignored.** They are never an error.
-5. **A scene is decided by the current numbers alone.** A companion only shows the current numbers in another form. It does not draw a graph or fill in between past values. The same feed gives the same scene, whenever and however often it is fetched. There is one exception, and it applies only to a screen that keeps updating: near a boundary it may hold the previous condition a little longer (3.7).
+5. **A scene is decided by what is in the feed alone.** A companion only shows the numbers it receives in another form. A scene that needs past values uses only the ones the sender put in the feed (`history`). The runtime and the companion do not keep past feeds. The same feed gives the same scene, whenever and however often it is fetched. There is one exception, and it applies only to a screen that keeps updating: near a boundary it may hold the previous condition a little longer (3.7).
 
 ## 3. Feed format
 
@@ -89,6 +89,8 @@ Each value is an object. Only `value` is required. The other fields are what the
 | `scale` | How large a move from `base` counts as 1 | — | Usual daily range |
 | `rate` | How fast the number is changing, in its own units per unit of time | Steps per hour | Change per minute |
 | `rateScale` | How large a `rate` counts as 1, in the same units | — | Usual change per minute |
+| `history` | Past values, oldest first. The current number is not repeated here. It stays in `value` | Steps at each past hour | Price at each past minute |
+| `every` | Seconds between the values in `history` | 3600 | 60 |
 | `unit` | Text put right after the number when it is shown | ` steps` | `원` |
 | `format` | How the number is shown: `"number"` (default), or `"duration"` for seconds shown as `9:00` | — | — |
 | `state` | The state of this value alone (3.4). Without it the value follows the feed's `state` | — | — |
@@ -107,13 +109,16 @@ A companion draws from these, not from the raw numbers. Each one except `rank` i
 | `under` | 0 to 1 | How far short of `from`, counted in ranges. 0 inside the range | `to` |
 | `rise` | −1 to 1 | (`value` − `base`) ÷ `scale` | `base`, and `scale` or a range |
 | `momentum` | −1 to 1 | `rate` ÷ `rateScale` | `rate` and `rateScale` |
+| `history` | List of 0 to 1 | The past values and then the current one, each worked out the same way as `fill` | `history` |
 | `share` | 0 to 1 | `value` ÷ sum of all values | Two or more values |
 | `rank` | 1, 2, 3… | Order by size. 1 is the largest | Two or more values |
 
 - `fill` is clamped to 0…1. What falls outside goes to `over` and `under`. 132 against a goal of 100 gives `fill` 1 and `over` 0.32.
 - The span for `rise` is `scale` if sent, otherwise the size of the range (`to` − `from`). Results are clamped to −1…1. This rule is provisional (see section 13).
-- Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the rate of change (`rate`). The unit of time is the sender's choice, as long as `rate` and `rateScale` use the same one.
+- Derived values come from one feed alone. The runtime does not remember past feeds to fill anything in. The sender is the one who knows the trend, so the sender sends the rate of change (`rate`) and the past values (`history`). The unit of time is the sender's choice, as long as `rate` and `rateScale` use the same one.
 - A missing `from` counts as 0. When the numbers a value needs are missing, the value is absent: no `fill` without `to` or when `to` equals `from`, no `rise` without `base` or a span, no `momentum` without `rate` or `rateScale`. Section 9 says when the runtime gives notice.
+- The derived `history` is the past values followed by the current one. It is therefore one entry longer than what was sent, and its last entry equals `fill`. Values outside the range are clamped to 0 and 1. Without a range (`to`), the smallest number in the list becomes 0 and the largest becomes 1, and if they are all equal every entry is 0.5. In that case the shape can change each time a value arrives, so the runtime gives notice (section 9).
+- `every` is not used in any calculation. It only tells how much time the list covers. It has the same name and unit as the viewer's refresh setting `every` (section 4), and is written in a different place.
 - `share` is for comparing numbers that have no upper end, such as scores. 1 against 10 gives 0.09 and 0.91. If any value is negative or the sum is 0, there is no `share`.
 - `rank` is the order by size. The largest value is 1, and equal values share a rank. With a single value there is nothing to compare, so there is no `share` and no `rank`.
 - The runtime may ease the scene into place when a new value arrives. It does not change the value it arrives at. A still image always shows the arrived value.
@@ -203,6 +208,7 @@ The runtime also turns the derived values into named conditions. Every companion
 | `extra` | 4 KB |
 | Strings | 64 characters |
 | `unit` | 8 characters |
+| `history` | 60 entries per value |
 
 Numbers must be finite. Text carries no angle brackets and no addresses. Anything over a limit or of the wrong type is dropped, not repaired.
 
@@ -251,14 +257,14 @@ A companion gets its feed from one of four sources. All produce the same format.
 
 | Source | Setting | Notes |
 |---|---|---|
-| Random | `data=random` (default) | Generated inside the page, no network. Moves smoothly. The same `seed` gives the same sequence |
+| Random | `data=random` (default) | Generated inside the page, no network. Moves smoothly. The same `seed` gives the same sequence, and `history` comes from that sequence too |
 | Inline | `v=62&to=100` | Values written directly in the address. Several values: `v=92,102` |
 | Date | `until=2026-12-25` | The page counts the days left until that date. No network |
 | URL | `data=<url>` | The page fetches a feed from that address |
 
 - Random is a source, not a special mode. Every companion therefore runs with no setup.
 - The date source gives the days left as `value` (3.1). On the day itself it is 0. After that it stays 0 and `state` becomes `"done"`. Add the starting day as `since=2026-11-01` and the range runs from the total number of days to 0. Dates are written `YYYY-MM-DD`, and the day changes in the viewer's own time zone.
-- Inline values take the numeric fields of `values` (`from`, `to`, `base`, `scale`, `rate`, `rateScale`) under the same names. Example: `v=102&base=100&scale=5&rate=0.8&rateScale=2`. A single number applies to every value. Write `to=110,120` when they differ.
+- Inline values take the numeric fields of `values` (`from`, `to`, `base`, `scale`, `rate`, `rateScale`) under the same names. Example: `v=102&base=100&scale=5&rate=0.8&rateScale=2`. A single number applies to every value. Write `to=110,120` when they differ. `history` is not written in the address.
 - Addresses written before 0.2 used `low`, `high` and `momentum`. The address still reads them for now: `low` as `from`, `high` as `to`, and `momentum` as a `rate` with a `rateScale` of 1. A feed does not.
 - If more than one is given, `data` wins over `v`, and `v` over `until`.
 - A URL source must allow cross-origin requests (CORS). An address on another site must use `https`. The address may carry its own query string, written with `%3F` and `%26` so it does not mix with the page's.
@@ -376,7 +382,7 @@ bl  bc  br
 | `grade` | `"basic"` or `"free"` (section 8) |
 | `still` | Whether it can produce a still image |
 | `reads.values` | How many values it reads: `1`, `2` or `"many"` |
-| `reads.needs` | Derived values it cannot do without: `"fill"`, `"rise"`, `"momentum"`, `"share"` |
+| `reads.needs` | Derived values it cannot do without: `"fill"`, `"rise"`, `"momentum"`, `"share"`, `"history"` |
 | `reads.step` | Whether it uses `step` |
 | `reads.events` | Event types it reacts to |
 | `reads.extra` | `extra` domains it reads |
@@ -524,7 +530,8 @@ The runtime compares what a companion declares with what actually arrives.
 | `from` is missing | Counts as 0. No notice |
 | A number has nothing to be divided by (`base` without `scale` or a range, `rate` without `rateScale`) | Warning. That value is absent |
 | A feed uses a field name from before 0.2 (`low`, `high`, `momentum`, `better`, `ttl` at the top, `now` and `total` in `step`) | Not read. Listed among the dropped fields |
-| A needed value cannot be computed (no `to` but `fill` is needed, or no `base` but `rise` is needed) | Warning |
+| A needed value cannot be computed (no `to` but `fill` is needed, no `base` but `rise` is needed, or `history` is needed and did not arrive) | Warning |
+| `history` is there with no range | Fitted to the smallest and largest numbers in the list. A notice is given |
 | The count differs (reads 2, got 1) | Warning |
 | A case uses a condition that cannot be worked out (`trend` without `base`) | Warning. That case never matches |
 | `extra` did not arrive | Draws from common fields and notes "showing default behavior" |

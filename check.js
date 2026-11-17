@@ -23,6 +23,7 @@ const TEXT = {
     notices: {
       "no-scale": (where) => `${where}: base 가 있는데 scale 도 범위(from, to)도 없어 rise 를 계산할 수 없습니다.`,
       "no-rate-scale": (where) => `${where}: rate 가 있는데 rateScale 이 없어 momentum 을 계산할 수 없습니다.`,
+      "history-no-range": (where) => `${where}: history 가 있는데 범위(to)가 없어 줄 안의 가장 작은 값과 큰 값에 맞춥니다. 값이 올 때마다 모양이 달라질 수 있습니다.`,
     },
     kinds: ["채움 또는 오르내림 (값 1개)", "맞대결 (값 2개)", "무리 (값 여럿)"],
     kind: "장면의 종류",
@@ -53,6 +54,7 @@ const TEXT = {
     notices: {
       "no-scale": (where) => `${where}: base is there, but with no scale and no range (from, to) rise cannot be computed.`,
       "no-rate-scale": (where) => `${where}: rate is there, but with no rateScale momentum cannot be computed.`,
+      "history-no-range": (where) => `${where}: history is there, but with no range (to) it is fitted to the smallest and largest numbers in the list. The shape can change each time a value arrives.`,
     },
     kinds: ["Fill or rise (1 value)", "Versus (2 values)", "Group (many values)"],
     kind: "Kind of scene",
@@ -79,6 +81,10 @@ const EXAMPLES = {
   },
   score: { spec: 1, values: [{ value: 92 }, { value: 102 }] },
   days: { spec: 1, values: [{ value: 12, from: 30, to: 0 }] },
+  past: {
+    spec: 1,
+    values: [{ value: 6200, to: 10000, history: [1200, 900, 2400, 5100, 7300, 6800, 5400], every: 3600 }],
+  },
 };
 
 const t = TEXT[document.documentElement.lang === "ko" ? "ko" : "en"];
@@ -104,6 +110,20 @@ function meter(value, signed) {
   bar.style.width = `${width * 100}%`;
   track.append(bar);
   return track;
+}
+
+// 지난 값들과 지금 값을 이은 선. 숫자만 쓴다.
+function line(points) {
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("class", "line");
+  svg.setAttribute("viewBox", "0 0 100 20");
+  svg.setAttribute("preserveAspectRatio", "none");
+  const path = document.createElementNS(NS, "polyline");
+  const step = 100 / (points.length - 1);
+  path.setAttribute("points", points.map((y, i) => `${round(i * step)},${round(19 - y * 18)}`).join(" "));
+  svg.append(path);
+  return svg;
 }
 
 function row(rows, name, value, signed) {
@@ -157,7 +177,8 @@ function show() {
     result.append(el("p", "note bad", `${t.dropped} ${dropped.join(", ")}`));
   }
   for (const notice of checkFeed(feed)) {
-    result.append(el("p", "note bad", t.notices[notice.code](notice.where)));
+    const tone = notice.level === "warn" ? "note bad" : "note";
+    result.append(el("p", tone, t.notices[notice.code](notice.where)));
   }
 
   computed.forEach((c, i) => {
@@ -169,8 +190,12 @@ function show() {
     if (c.under) row(rows, "under", c.under, false);
     row(rows, "rise", c.rise, true);
     row(rows, "momentum", c.momentum, true);
+    if (c.history) {
+      rows.append(el("code", "", "history"), el("span", "num", String(c.history.length)), line(c.history));
+    }
     // 값이 하나이면 견줄 것이 없어 몫과 순위가 없다.
     const pairs = Object.entries(judged.values[i]);
+    if (c.raw.every !== undefined) pairs.push(["every", String(c.raw.every)]);
     if (feed.values.length > 1) {
       row(rows, "share", c.share, false);
       pairs.push(["rank", String(c.rank)]);

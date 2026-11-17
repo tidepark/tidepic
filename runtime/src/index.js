@@ -292,7 +292,7 @@ export async function start({
       return;
     }
     shown = target.map((t, i) => {
-      const out = { raw: t.raw, rank: t.rank, state: t.state };
+      const out = { raw: t.raw, rank: t.rank, state: t.state, history: t.history };
       for (const name of ["fill", "over", "under", "rise", "momentum", "share"]) {
         const from = shown[i][name];
         out[name] =

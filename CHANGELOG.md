@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.7 — 2026-11-17
+
+- A value can carry its past values: `history` (oldest first, up to 60 per value) and `every` (seconds between them). The runtime turns them into a list of 0 to 1, worked out the same way as `fill`, with the current value at the end. Without a range the list is fitted to its own smallest and largest numbers, and the runtime gives notice (3.1, 3.2, 3.8, 9).
+- Principle 5 now reads "a scene is decided by what is in the feed alone". Before, it said the current numbers alone. What it keeps is the same: the same feed gives the same scene, and neither the runtime nor a companion keeps past feeds (2).
+- The random source sends `history` from the same sequence. A companion can declare `"history"` in `reads.needs` (4, 6).
+
+- 값에 지난 값을 실을 수 있다. `history`(오래된 것부터, 값 하나에 60개까지)와 `every`(값 사이의 간격, 초)다. 런타임은 이것을 `fill`과 같은 식으로 0~1 의 줄로 바꾸고, 맨 끝에 지금 값을 붙인다. 범위가 없으면 줄 안의 가장 작은 값과 큰 값에 맞추고 알린다(3.1절, 3.2절, 3.8절, 9절).
+- 원칙 5를 "장면은 피드에 담긴 것만으로 정해진다"로 고쳤다. 전에는 "지금의 숫자만으로"였다. 지키는 것은 같다. 같은 피드는 같은 장면이고, 런타임과 컴패니언은 지난 피드를 기억해 두지 않는다(2절).
+- 난수는 같은 흐름에서 `history`도 낸다. 컴패니언은 `reads.needs`에 `"history"`를 밝힐 수 있다(4절, 6절).
+
 ## 0.2.6 — 2026-11-17
 
 - A skin can declare options: parts of its look that can be changed, each one a choice of words, a range of numbers, or a color. Values come from the address (`skin.<name>`), from `view.options` in the feed, or from `options` in the config file, in that order. Anything the skin did not declare is dropped (3.10, 5, 7.3, 11).
