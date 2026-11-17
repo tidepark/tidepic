@@ -79,7 +79,7 @@ const EXAMPLES = {
     values: [{ value: 71200, from: 70100, to: 71900, base: 70500, scale: 1400, rate: 50, rateScale: 150, unit: "원" }],
     meta: { ttl: 60 },
   },
-  score: { spec: 1, values: [{ value: 92 }, { value: 102 }] },
+  teams: { spec: 1, values: [{ value: 14, to: 20 }, { value: 17, to: 20 }] },
   days: { spec: 1, values: [{ value: 12, from: 30, to: 0 }] },
   past: {
     spec: 1,

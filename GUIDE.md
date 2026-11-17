@@ -33,7 +33,7 @@ Do not turn a number into 0 to 1 or into a percentage before sending it. Send th
 | `history` | Past values, oldest first, up to 60 | | |
 | `every` | Seconds between the values in `history` | | |
 
-A range has a direction. `"from": 78, "to": 70` is a weight going down to a goal of 70.
+A range has a direction. `"from": 30, "to": 0` is days left, counting down from 30 to 0.
 
 ## 3. Which fields for which kind of number
 
@@ -102,10 +102,10 @@ A range has a direction. `"from": 78, "to": 70` is a weight going down to a goal
 
 How much, how fast and how well are numbers, not states. Do not invent states. One that is not in the table is ignored.
 
-`event` marks a moment that just happened, such as a goal scored. `type` is a short lowercase word and `at` is a Unix time in seconds. A new `at` means a new event.
+`event` marks a moment that just happened, such as a goal being reached. `type` is a short lowercase word and `at` is a Unix time in seconds. A new `at` means a new event.
 
 ```json
-{ "spec": 1, "values": [{ "value": 2 }, { "value": 1 }], "event": { "type": "score", "index": 0, "at": 1794787200 } }
+{ "spec": 1, "values": [{ "value": 20, "to": 20 }], "event": { "type": "reached", "index": 0, "at": 1794787200 } }
 ```
 
 ## 5. Optional parts

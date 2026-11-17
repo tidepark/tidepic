@@ -8,8 +8,7 @@
 
 This could be a stock price,\
 or today's temperature,\
-or today's weight,\
-or today's step count.
+or this week's visitors.
 
 When that number climbs, the train heads uphill. When it falls, downhill.
 

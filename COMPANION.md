@@ -30,9 +30,9 @@ Before writing anything, write down what the numbers become. A companion does no
 | Decide | Examples |
 |---|---|
 | What one value becomes | one flower, one window, one lane, one stalk |
-| What `fill` (0 to 1) becomes | how far a flower opens, how bright a light is, how high water stands |
+| What `fill` (0 to 1) becomes | how far a flower opens, how hard it rains, how tall bamboo grows |
 | What 0 looks like | a bud, an unlit window. It should differ from "a little" |
-| What happens past the range (`over`) | it grows past the frame, the water spills |
+| What happens past the range (`over`) | the bamboo grows past its goal, sparks fly up from the fire |
 | What `rise` and `momentum` become, if used | altitude, the slope of a track, the strength of wind |
 | How each state looks | `idle`: resting, dim. `done`: finished. `fault`: broken. `stale`: no news, the whole scene subdued |
 | How many values it reads | 1, 2, or many (up to 64). With many, how the scene makes room |
