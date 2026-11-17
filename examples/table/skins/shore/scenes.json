@@ -4,6 +4,12 @@
   "scenes": [
     { "when": { "state": "stale" }, "show": "fog.webp" },
     { "when": { "state": ["idle", "done"] }, "show": "night.webp" },
+    { "when": { "bound": "over" }, "show": "over.webp",
+      "effects": [
+        { "type": "drift", "image": "fish.webp", "amount": "over", "size": 0.08 },
+        { "type": "float", "image": "dot.webp", "amount": 0.5, "size": 0.03 }
+      ] },
+    { "when": { "bound": "under" }, "show": "dry.webp" },
     { "when": { "level": "full" }, "show": "full.webm", "poster": "full.webp",
       "effects": [{ "type": "float", "image": "dot.webp", "amount": "fill", "size": 0.03 }] },
     { "when": { "level": "high" }, "show": "high.webp",
