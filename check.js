@@ -3,6 +3,7 @@
 import { checkFeed } from "./runtime/src/check.js";
 import { computeFeed } from "./runtime/src/compute.js";
 import { judgeFeed } from "./runtime/src/conditions.js";
+import { formatValue } from "./runtime/src/overlay.js";
 import { parseFeed } from "./runtime/src/validate.js";
 
 const TEXT = {
@@ -73,7 +74,8 @@ const EXAMPLES = {
   price: {
     spec: 1,
     state: "live",
-    values: [{ value: 71200, from: 70100, to: 71900, base: 70500, scale: 1400, rate: 50, rateScale: 150 }],
+    values: [{ value: 71200, from: 70100, to: 71900, base: 70500, scale: 1400, rate: 50, rateScale: 150, unit: "원" }],
+    meta: { ttl: 60 },
   },
   score: { spec: 1, values: [{ value: 92 }, { value: 102 }] },
   days: { spec: 1, values: [{ value: 12, from: 30, to: 0 }] },
@@ -151,7 +153,7 @@ function show() {
 
   computed.forEach((c, i) => {
     const card = el("section", "card");
-    card.append(el("h2", "", `${t.value(i + 1)}: ${c.raw.value}`));
+    card.append(el("h2", "", `${t.value(i + 1)}: ${formatValue(c.raw)}`));
     const rows = el("div", "rows");
     row(rows, "fill", c.fill, false);
     if (c.over) row(rows, "over", c.over, false);
@@ -175,6 +177,9 @@ function show() {
   if (feed.values.length > 2) pairs.push(["focus", String(judged.focus)]);
   const kind = t.kinds[Math.min(feed.values.length, 3) - 1];
   whole.append(el("p", "", `${t.kind}: ${kind}`), chips(pairs));
+  if (feed.meta) {
+    whole.append(chips(Object.entries(feed.meta).map(([key, value]) => [key, String(value)])));
+  }
   result.append(whole, el("p", "note", t.foot));
 }
 

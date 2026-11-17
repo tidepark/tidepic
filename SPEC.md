@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.2.1 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.2.2 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -40,7 +40,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
   "state": "live",
   "event": { "type": "score", "index": 1, "at": 1794787200 },
   "extra": { "baseball": { "inning": 7, "outs": 2 } },
-  "ttl": 60
+  "meta":  { "ttl": 60 }
 }
 ```
 
@@ -53,7 +53,7 @@ People have been showing numbers as scenes instead of charts for a long time (se
 | `state` | no | Progress state |
 | `event` | no | A moment that just happened |
 | `extra` | no | Domain-specific data |
-| `ttl` | no | Minimum seconds before asking again |
+| `meta` | no | Information about the feed itself (3.9) |
 
 ### 3.1 `values`
 
@@ -76,6 +76,8 @@ Each value is an object. Only `value` is required. The other fields are what the
 | `scale` | How large a move from `base` counts as 1 | — | Usual daily range |
 | `rate` | How fast the number is changing, in its own units per unit of time | Steps per hour | Change per minute |
 | `rateScale` | How large a `rate` counts as 1, in the same units | — | Usual change per minute |
+| `unit` | Text put right after the number when it is shown | ` steps` | `원` |
+| `format` | How the number is shown: `"number"` (default), or `"duration"` for seconds shown as `9:00` | — | — |
 
 - The range has a direction. It runs from `from` to `to`, and `to` may be the smaller number. A weight going from 78 down to 70 is `"from": 78, "to": 70`.
 - For a countdown, `value` is the days left, `from` is the total days and `to` is 0. The fill grows as the day approaches.
@@ -178,8 +180,26 @@ The runtime also turns the derived values into named conditions. Every companion
 | `values` | 64 items |
 | `extra` | 4 KB |
 | Strings | 64 characters |
+| `unit` | 8 characters |
 
-Numbers must be finite. Anything over a limit or of the wrong type is dropped, not repaired.
+Numbers must be finite. Text carries no angle brackets and no addresses. Anything over a limit or of the wrong type is dropped, not repaired.
+
+### 3.9 `meta`
+
+```json
+"meta": { "ttl": 60, "at": 1794787200, "credit": "Based on data from MET Norway" }
+```
+
+Information about the feed itself, not about the scene.
+
+| Field | Meaning |
+|---|---|
+| `ttl` | Minimum seconds before asking again |
+| `at` | When the values were true, as a Unix time in seconds (the same form as `event.at`) |
+| `credit` | Where the data comes from. Text, up to 64 characters |
+
+- The runtime uses `ttl` only. It does not draw `at` or `credit` on the scene.
+- A feed that passes someone else's data on can carry the credit that data asks for here.
 
 ## 4. Data sources
 
@@ -203,7 +223,7 @@ A companion gets its feed from one of four sources. All produce the same format.
 ### Refresh
 
 - The viewer sets the interval with `every` (seconds).
-- If the feed carries `ttl`, the companion does not ask more often than that.
+- If the feed carries `meta.ttl`, the companion does not ask more often than that.
 
 ## 5. Companion package
 
@@ -273,6 +293,7 @@ bl  bc  br
 - The runtime draws them on top of the scene. A companion's drawing code never draws text, so every companion gets the same title and number.
 - They are drawn on the canvas, not as page elements, so a still image shows them too.
 - With one value the number is that value. With two it is shown as `92 : 102`. With more, it is the value that `focus` points to.
+- The sender can say how the number reads. `unit` is put right after it, as in `13.3°C` or `71,200원`. Put a space at the start of the unit if one is wanted. With `"format": "duration"` a number of seconds is shown as `9:00` or `4:20:00`.
 - If both land in the same cell, the title sits above the number.
 - A skin may suggest positions that suit its artwork (`"overlay": { "titleAt": "tc", "numAt": "bc" }` in `skin.json`). The viewer's choice wins.
 
@@ -415,7 +436,7 @@ The runtime compares what a companion declares with what actually arrives.
 |---|---|
 | `from` is missing | Counts as 0. No notice |
 | A number has nothing to be divided by (`base` without `scale` or a range, `rate` without `rateScale`) | Warning. That value is absent |
-| A feed uses a field name from before 0.2 (`low`, `high`, `momentum`, `better`) | Not read. Listed among the dropped fields |
+| A feed uses a field name from before 0.2 (`low`, `high`, `momentum`, `better`, `ttl` at the top, `now` and `total` in `step`) | Not read. Listed among the dropped fields |
 | A needed value cannot be computed (no `to` but `fill` is needed, or no `base` but `rise` is needed) | Warning |
 | The count differs (reads 2, got 1) | Warning |
 | A case uses a condition that cannot be worked out (`trend` without `base`) | Warning. That case never matches |

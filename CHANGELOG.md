@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2 — 2026-11-17
+
+- A value can say how its number reads: `unit` (`13.3°C`, `71,200원`) and `format` (`"duration"` shows seconds as `9:00`) (3.1, 5).
+- New `meta` for information about the feed itself: `ttl`, `at`, `credit`. `ttl` moved here from the top of the feed. The runtime does not draw `at` or `credit` (3, 3.9, 4).
+
+- 값이 자기 숫자를 어떻게 읽을지 적을 수 있다. `unit`(`13.3°C`, `71,200원`)과 `format`(`"duration"`이면 초를 `9:00`으로)이다(3.1절, 5절).
+- 피드 자체에 대한 정보를 담는 `meta`를 더했다. `ttl`, `at`, `credit`이다. `ttl`은 피드의 맨 위에서 여기로 옮겼다. 런타임은 `at`과 `credit`을 그리지 않는다(3절, 3.9절, 4절).
+
 ## 0.2.1 — 2026-11-17
 
 - `focus` says which value the case table and the number look at. It replaces "the first value" (3, 3.7, 5).

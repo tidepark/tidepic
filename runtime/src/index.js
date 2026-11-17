@@ -19,7 +19,7 @@ export { randomFeed } from "./random.js";
 export { dateFeed, parseDay } from "./dates.js";
 export { readConfig, POSITIONS } from "./config.js";
 export { checkFeed, checkReads } from "./check.js";
-export { drawOverlay, numberText, formatNumber } from "./overlay.js";
+export { drawOverlay, numberText, formatNumber, formatValue } from "./overlay.js";
 
 const FRAME_MS = 1000 / 30; // 초당 30장을 넘지 않는다 (규칙 10절)
 const EASE_SECONDS = 0.6; // 새 값의 장면으로 옮겨 가는 시간. 도착하는 값은 바꾸지 않는다
@@ -233,7 +233,7 @@ export async function start({
       failures = 0;
       // 난수는 네트워크를 쓰지 않으므로 1초마다 새로 만든다 (잠정).
       seconds =
-        source.kind === "random" ? 1 : Math.max(config.every, feed.ttl ?? 0);
+        source.kind === "random" ? 1 : Math.max(config.every, feed.meta?.ttl ?? 0);
     } catch (error) {
       if (mine !== round) return;
       failures += 1;

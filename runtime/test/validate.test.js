@@ -9,7 +9,7 @@ const sample = {
   state: "live",
   event: { type: "score", index: 0, at: 1794787200 },
   extra: { baseball: { inning: 7, half: "bottom", outs: 2, bases: [1, 0, 1] } },
-  ttl: 60,
+  meta: { ttl: 60, at: 1794787200, credit: "Based on data from MET Norway" },
 };
 
 test("규칙의 예시 피드는 그대로 통과한다", () => {
@@ -36,6 +36,34 @@ test("values 는 64개까지다. 넘으면 잘라 쓰지 않고 버린다", () =
   assert.equal(validateFeed(many(65)).ok, false);
 });
 
+test("단위와 형식은 짧은 글자와 정해진 이름만 받는다", () => {
+  const value = (extra) => validateFeed({ spec: 1, values: [{ value: 5, ...extra }] });
+  assert.deepEqual(value({ unit: "°C", format: "duration" }).feed.values, [
+    { value: 5, unit: "°C", format: "duration" },
+  ]);
+  assert.deepEqual(value({ unit: " steps" }).feed.values, [{ value: 5, unit: " steps" }]);
+  for (const unit of ["", "아홉 글자가 넘는 단위", "<b>", "a\nb", 5]) {
+    assert.deepEqual(value({ unit }).dropped, ["values[0].unit"]);
+  }
+  assert.deepEqual(value({ format: "percent" }).dropped, ["values[0].format"]);
+});
+
+test("meta 는 ttl, at, credit 을 받는다. 맨 위의 ttl 은 읽지 않는다", () => {
+  const feed = (extra) => validateFeed({ spec: 1, values: [{ value: 1 }], ...extra });
+  assert.deepEqual(feed({ meta: { ttl: 600, at: 1794787200, credit: "MET Norway" } }).feed.meta, {
+    ttl: 600,
+    at: 1794787200,
+    credit: "MET Norway",
+  });
+  const bad = feed({ meta: { ttl: -1, at: "now", credit: "see https://example.com" } });
+  assert.equal(bad.feed.meta, undefined);
+  assert.deepEqual(bad.dropped.sort(), ["meta.at", "meta.credit", "meta.ttl"]);
+  assert.deepEqual(feed({ meta: "x" }).dropped, ["meta"]);
+  const old = feed({ ttl: 60 });
+  assert.equal(old.feed.meta, undefined);
+  assert.deepEqual(old.dropped, ["ttl"]);
+});
+
 test("focus 는 values 안의 순서여야 한다", () => {
   const feed = (focus) => ({ spec: 1, values: [{ value: 1 }, { value: 2 }, { value: 3 }], focus });
   assert.equal(validateFeed(feed(2)).feed.focus, 2);
@@ -58,7 +86,7 @@ test("선택 항목이 틀리면 그 항목만 버린다. 고쳐 쓰지 않는�
   assert.equal(result.ok, true);
   assert.deepEqual(result.feed.values, [{ value: 5, to: 10 }]);
   assert.equal(result.feed.step, undefined);
-  assert.equal(result.feed.ttl, undefined);
+  assert.equal(result.feed.meta, undefined);
   assert.deepEqual(result.dropped.sort(), [
     "focus",
     "step",

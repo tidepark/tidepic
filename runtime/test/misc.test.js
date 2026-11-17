@@ -4,7 +4,7 @@ import { randomFeed } from "../src/random.js";
 import { validateFeed } from "../src/validate.js";
 import { computeFeed } from "../src/compute.js";
 import { checkFeed, checkReads } from "../src/check.js";
-import { formatNumber, numberText } from "../src/overlay.js";
+import { formatDuration, formatNumber, numberText } from "../src/overlay.js";
 import { createSource } from "../src/source.js";
 
 test("난수는 씨앗과 시각이 같으면 같은 피드를 낸다", () => {
@@ -78,6 +78,14 @@ test("숫자는 기기 설정과 상관없이 같은 모양으로 적는다", ()
 test("값이 1개면 그 값, 2개면 맞대결, 그보다 많으면 숫자를 보여 주지 않는다", () => {
   assert.equal(numberText([{ value: 62 }]), "62");
   assert.equal(numberText([{ value: 92 }, { value: 102 }]), "92 : 102");
+  // 단위는 숫자 바로 뒤에 붙이고, 형식이 duration 이면 초를 시간으로 보여 준다.
+  assert.equal(numberText([{ value: -3.5, unit: "°C" }]), "-3.5°C");
+  assert.equal(numberText([{ value: 71200, unit: "원" }]), "71,200원");
+  assert.equal(numberText([{ value: 540, format: "duration" }]), "9:00");
+  assert.equal(numberText([{ value: 15600, format: "duration" }]), "4:20:00");
+  assert.equal(formatDuration(59.6), "1:00");
+  assert.equal(formatDuration(0), "0:00");
+  assert.equal(formatDuration(-75), "-1:15");
   // 값이 셋 이상이면 focus 가 가리키는 값을 보여 준다. 없으면 첫째다.
   assert.equal(numberText([{ value: 1 }, { value: 2 }, { value: 3 }]), "1");
   assert.equal(numberText([{ value: 1 }, { value: 2 }, { value: 3 }], 2), "3");

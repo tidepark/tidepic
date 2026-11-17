@@ -6,9 +6,12 @@ export const LIMITS = {
   values: 64,
   extraBytes: 4 * 1024,
   text: 64,
+  unit: 8,
 };
 
 const STATES = ["live", "idle", "done"];
+const FORMATS = ["number", "duration"];
+const CONTROL = /[\u0000-\u001f\u007f]/;
 const WORD = /^[a-z]+$/;
 const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
@@ -21,6 +24,14 @@ const isWord = (x) =>
   x.length <= LIMITS.text &&
   WORD.test(x) &&
   !UNSAFE_KEYS.has(x);
+
+// 짧은 글. 제어 문자, HTML 꺾쇠, 주소가 있거나 길면 받지 않는다. 고쳐 쓰지 않는다.
+const isText = (x, max) =>
+  typeof x === "string" &&
+  x.length > 0 &&
+  Array.from(x).length <= max &&
+  !CONTROL.test(x) &&
+  !/[<>]|:\/\//.test(x);
 
 // code 는 화면이 제 말로 바꿔 보여 줄 때 쓴다. where 는 틀린 자리다.
 const fail = (error, code, where) => ({ ok: false, error, code, ...(where && { where }) });
@@ -79,10 +90,12 @@ export function validateFeed(data) {
     const extra = cleanExtra(data.extra, dropped);
     if (extra) feed.extra = extra;
   }
-  if (data.ttl !== undefined) {
-    if (isNum(data.ttl) && data.ttl >= 0) feed.ttl = data.ttl;
-    else dropped.push("ttl");
+  if (data.meta !== undefined) {
+    const meta = cleanMeta(data.meta, dropped);
+    if (meta) feed.meta = meta;
   }
+  // 0.2 에서 meta 안으로 옮겼다. 읽지 않지만, 보낸 쪽이 알 수 있게 버린 목록에 넣는다.
+  if (data.ttl !== undefined) dropped.push("ttl");
   return { ok: true, feed, dropped };
 }
 
@@ -101,6 +114,15 @@ function cleanValue(v, i, dropped) {
     if (isNum(v[key]) && v[key] > 0) out[key] = v[key];
     else dropped.push(`values[${i}].${key}`);
   }
+  // 숫자를 보여 줄 때의 단위와 형식. 보내는 쪽만 안다.
+  if (v.unit !== undefined) {
+    if (isText(v.unit, LIMITS.unit)) out.unit = v.unit;
+    else dropped.push(`values[${i}].unit`);
+  }
+  if (v.format !== undefined) {
+    if (FORMATS.includes(v.format)) out.format = v.format;
+    else dropped.push(`values[${i}].format`);
+  }
   // 0.2 에서 없앤 이름. 읽지 않지만, 보낸 쪽이 알 수 있게 버린 목록에 넣는다.
   for (const key of ["low", "high", "momentum", "better"]) {
     if (v[key] !== undefined) dropped.push(`values[${i}].${key}`);
@@ -117,6 +139,26 @@ function cleanStep(step) {
     out.to = step.to;
   }
   return out;
+}
+
+// 피드 자체에 대한 정보. ttl 은 다시 묻기까지의 간격(초), at 은 값의 시각(초 단위 유닉스 시각),
+// credit 은 자료의 출처다. 장면에는 그리지 않는다.
+function cleanMeta(meta, dropped) {
+  if (!isObject(meta)) {
+    dropped.push("meta");
+    return null;
+  }
+  const out = {};
+  for (const key of ["ttl", "at"]) {
+    if (meta[key] === undefined) continue;
+    if (isNum(meta[key]) && meta[key] >= 0) out[key] = meta[key];
+    else dropped.push(`meta.${key}`);
+  }
+  if (meta.credit !== undefined) {
+    if (isText(meta.credit, LIMITS.text)) out.credit = meta.credit;
+    else dropped.push("meta.credit");
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 function cleanEvent(event, count) {

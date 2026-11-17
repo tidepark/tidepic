@@ -8,12 +8,25 @@ export function formatNumber(n) {
   return (rounded < 0 ? "-" : "") + grouped + (frac ? "." + frac : "");
 }
 
+// 초를 9:00, 4:20:00 처럼 보여 준다.
+export function formatDuration(seconds) {
+  const s = Math.round(Math.abs(seconds));
+  const pad = (n) => String(n).padStart(2, "0");
+  const [h, m] = [Math.floor(s / 3600), Math.floor((s % 3600) / 60)];
+  const text = h ? `${h}:${pad(m)}:${pad(s % 60)}` : `${m}:${pad(s % 60)}`;
+  return (seconds < 0 && s > 0 ? "-" : "") + text;
+}
+
+// 값 하나를 보내는 쪽이 적은 형식과 단위로 보여 준다. 단위는 숫자 바로 뒤에 붙인다.
+export function formatValue(v) {
+  const text = v.format === "duration" ? formatDuration(v.value) : formatNumber(v.value);
+  return text + (v.unit ?? "");
+}
+
 // 값이 1개면 그 값, 2개면 "92 : 102", 그보다 많으면 focus 가 가리키는 값을 보여 준다.
 export function numberText(values, focus = 0) {
-  if (values.length === 2) {
-    return `${formatNumber(values[0].value)} : ${formatNumber(values[1].value)}`;
-  }
-  return formatNumber(values[values.length === 1 ? 0 : focus].value);
+  if (values.length === 2) return `${formatValue(values[0])} : ${formatValue(values[1])}`;
+  return formatValue(values[values.length === 1 ? 0 : focus]);
 }
 
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
