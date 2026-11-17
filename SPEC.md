@@ -2,7 +2,7 @@
 
 **Rules for showing numbers as scenes instead of charts.**
 
-Version 0.1.7 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
+Version 0.1.8 (draft) · 2026-11-17 · [한국어](SPEC.ko.md) · [CC BY 4.0](LICENSE.md)
 
 This document defines two things: the data a tidepic companion receives, and how a companion is packaged. It is a draft. Details may change before 1.0.
 
@@ -304,7 +304,7 @@ A skin is everything a companion shows: images, video, and the numbers that arra
 
 - A skin contains no code, no URLs and no font files. Files are referred to by plain file names inside the skin's own folder.
 - The same companion with a different skin reads the same data and looks different.
-- A different skin can change far more than a picture. It can bring its own effects or video.
+- A different skin changes more than the picture. It can bring its own effects or video.
 
 There are two kinds, matching how the companion is made (section 5).
 
@@ -457,7 +457,7 @@ A warning never blanks the screen. The companion draws what it can.
 
 ## 14. Prior art
 
-People have long tried to show numbers as scenes or objects instead of charts. tidepic stands on that work.
+People have long tried to show numbers as scenes or objects instead of charts. tidepic is one more attempt in that line.
 
 - Research on ambient displays, which sit at the edge of attention
 - Informative art (2000): screens that look like paintings on a wall and carry information such as the weather
@@ -465,6 +465,6 @@ People have long tried to show numbers as scenes or objects instead of charts. t
 - Badges that take a value from a URL and return a picture
 - Formats that describe motion graphics as JSON (Lottie). These now also have state machines that take numbers from code and change the picture
 
-tidepic does a different job from these. They define how a picture is drawn, or what one product shows. tidepic does not define how to draw. It only defines what shape the numbers arrive in and how those numbers connect to a scene. A companion can therefore be made with canvas code, with a few images, or with a Lottie file.
+tidepic covers less than these. It does not say how a picture is drawn. The work above already does that, and a companion uses it as it is: canvas code, a few images, or a Lottie file. tidepic writes down what shape the numbers arrive in and how they connect to a scene.
 
-tidepic defines only two things: a feed that carries any number in the same shape, and a way to package a companion that turns those numbers into a scene.
+tidepic defines only two things: a feed that carries numbers in one shape, and a way to package a companion that turns those numbers into a scene.

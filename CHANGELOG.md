@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8 — 2026-11-17
+
+- Wording only. Section 14 now says what tidepic covers instead of comparing it with earlier work. Removed "any number" (14) and "far more" (7). No rule changed.
+- 문장만 고쳤다. 14절에서 앞선 것들과 견주는 문장을 tidepic 이 다루는 범위를 말하는 문장으로 바꿨다. 「어떤 숫자든」(14절)과 「훨씬」(7절)을 뺐다. 규칙은 바뀌지 않았다.
+
 ## 0.1.7 — 2026-11-17
 
 - Inline values can carry `scale` and `momentum` in the address, so a scene that follows rise or momentum can be driven by an address alone (4, 5).
