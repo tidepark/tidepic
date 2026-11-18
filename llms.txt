@@ -15,6 +15,7 @@ If you are asked to connect some data to a tidepic scene, you are being asked to
 
 - [Tidepark gallery](https://tidepark.com/gallery): companions you can connect a feed to. Each scene's page lets you pick a skin and settings and shows the feed JSON with them in `view`, ready to copy
 - [Tidepark llms.txt](https://tidepark.com/llms.txt): each scene's address, skin names, options, still picture and sample feed
+- [tidetop](https://github.com/tidepark/tidetop): a terminal program that draws a scene from a feed with `tidetop --data <feed address> --scene <name>` (grove, stars, library, campfire, tide, windows). Without `--data` it shows the computer's spare CPU or memory. Install with `npx tidetop`, Homebrew or a release binary
 
 ## Reference
 

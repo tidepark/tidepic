@@ -92,6 +92,9 @@
     <p>To write a feed yourself, see <a href="GUIDE.md">Writing a feed</a>. To have an AI assistant write it, give it the address of that page (<code>https://tidepic.com/GUIDE.md</code>) and say what you want to show.</p>
     <p>To make a new scene, see <a href="COMPANION.md">Making a companion</a>. To have an AI assistant build it, give it the address of that page (<code>https://tidepic.com/COMPANION.md</code>) and describe the scene.</p>
     <p>There is also an <a href="examples/table/?v=20&amp;to=100&amp;num=1">example</a> made with a case table and a few pictures, and <a href="examples/code/?v=60&amp;to=100">one</a> drawn with code. The runtime that plays them is on GitHub with the rules.</p>
+    <p>The rules also work outside a browser. <a href="https://github.com/tidepark/tidetop">tidetop</a> draws a scene in a terminal from how much room the computer has left. Given a feed with <code class="flag">--data</code>, it draws the feed instead.</p>
+    <pre class="cmd"><code>npx tidetop --data https://tidepark.com/feed/sample/library --scene library</code></pre>
+    <img class="shot" src="tidetop.png" alt="The library scene in a terminal, drawn by tidetop" width="800" height="480" loading="lazy">
     <p>Tidepark is the gallery. It shows companions built with these rules, and you can try them there.</p>
     <footer>A draft. Showing numbers as scenes is not a new idea. tidepic only writes down one set of conventions, and the rules list the work that came before. Licensed under <a href="https://github.com/tidepark/tidepic/blob/main/LICENSE.md">CC BY 4.0</a>.</footer>
   </div>

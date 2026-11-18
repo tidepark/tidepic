@@ -36,6 +36,8 @@
 
 AI 에게 맡기려면 `https://tidepic.com/GUIDE.ko.md`를 주고 무엇을 보여 주고 싶은지 말하면 됩니다. 읽을 것을 모아 둔 [`llms.txt`](llms.txt)도 있습니다.
 
+터미널에서는 [tidetop](https://github.com/tidepark/tidetop) 이 피드를 장면으로 그립니다: `npx tidetop --data <피드 주소> --scene library`. `--data` 없이 띄우면 컴퓨터에 남은 여유를 보여 줍니다.
+
 ## 새 장면 만들기
 
 장면(컴패니언)은 두 가지로 만들 수 있습니다. 그림 몇 장과 경우표로 만들거나, 그리기 코드를 직접 짭니다. [컴패니언 만드는 법](COMPANION.ko.md)에 순서가 있습니다. AI 에게 맡길 때는 `https://tidepic.com/COMPANION.ko.md`를 주고 어떤 장면을 바라는지 말합니다.

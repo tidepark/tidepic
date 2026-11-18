@@ -36,6 +36,8 @@ These pictures are not files in this repository. Each one is fetched as it is sh
 
 To have an AI assistant do it, give it `https://tidepic.com/GUIDE.md` and say what you want to show. [`llms.txt`](llms.txt) lists what to read.
 
+In a terminal, [tidetop](https://github.com/tidepark/tidetop) draws a feed as a scene: `npx tidetop --data <feed address> --scene library`. Without `--data` it shows how much room the computer has left.
+
 ## Making a new scene
 
 A scene (a companion) can be made in two ways: from a few pictures and a case table, or with drawing code of your own. [Making a companion](COMPANION.md) has the steps. With an AI assistant, give it `https://tidepic.com/COMPANION.md` and describe the scene.

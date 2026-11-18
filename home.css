@@ -49,6 +49,10 @@ pre output { display: inline-block; min-width: 2ch; font-weight: 700; text-align
 .usual text { fill: currentColor; font: 700 26px system-ui, sans-serif; }
 .usual .of { fill: #6b7280; font: 400 10px system-ui, sans-serif; }
 .note { font-size: 0.95rem; }
+/* 터미널 이야기: 명령 한 줄과 tidetop 이 그린 화면 한 장 */
+.cmd { white-space: pre; overflow-x: auto; font-size: 0.9rem; }
+.flag { white-space: nowrap; }
+.shot { display: block; width: 100%; height: auto; margin: 1rem 0 0; border-radius: 0.75rem; }
 
 .text { max-width: 44rem; margin: 3rem 0 0; }
 .lines { color: var(--ink); font-size: 1.15rem; line-height: 1.75; margin: 0; }
