@@ -6,6 +6,12 @@
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
   window.gtag("js", new Date());
+  // 첫 페이지가 이 페이지로 보냈으면, 그 전에 있던 곳을 들어온 곳으로 알린다.
+  try {
+    var from = sessionStorage.getItem("cameFrom");
+    sessionStorage.removeItem("cameFrom");
+    if (from) window.gtag("set", "page_referrer", from);
+  } catch (e) {}
   var tag = document.createElement("script");
   tag.async = true;
   tag.src = "https://www.googletagmanager.com/gtm.js?id=GTM-TVS94Z25";

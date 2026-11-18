@@ -29,6 +29,7 @@
   if (chosen === "ko" || (!chosen && !inside && /^ko\b/i.test(first))) {
     window.tidepicLeaving = true;
     location.replace("ko.html");
+    try { sessionStorage.setItem("cameFrom", document.referrer); } catch (e) {}
   }
 })();
 </script>
