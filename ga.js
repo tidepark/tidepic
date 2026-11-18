@@ -7,10 +7,11 @@
   window.gtag = function () { window.dataLayer.push(arguments); };
   window.gtag("js", new Date());
   // 첫 페이지가 이 페이지로 보냈으면, 그 전에 있던 곳을 들어온 곳으로 알린다.
+  // 태그는 페이지에서 건넨 값을 받지 않고 document.referrer 를 읽으므로, 그 값을 바꿔 둔다.
   try {
     var from = sessionStorage.getItem("cameFrom");
     sessionStorage.removeItem("cameFrom");
-    if (from) window.gtag("set", "page_referrer", from);
+    if (from) Object.defineProperty(document, "referrer", { get: function () { return from; } });
   } catch (e) {}
   var tag = document.createElement("script");
   tag.async = true;
