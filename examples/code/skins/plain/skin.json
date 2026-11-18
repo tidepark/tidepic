@@ -1,0 +1,6 @@
+{
+  "slug": "plain",
+  "name": { "en": "Plain", "ko": "기본" },
+  "images": {},
+  "layout": { "wave": 0.03, "sun": 0.09 }
+}

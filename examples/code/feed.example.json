@@ -1,0 +1,6 @@
+{
+  "spec": 1,
+  "values": [{ "value": 6200, "to": 10000, "base": 5400 }],
+  "state": "live",
+  "meta": { "ttl": 30 }
+}

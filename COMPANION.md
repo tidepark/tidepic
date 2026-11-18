@@ -86,6 +86,8 @@ start({ canvas: document.getElementById("scene") });
 
 ## 5. Drawing code
 
+Start from the [example](examples/code/). Copy the folder and change `draw.js`.
+
 `main.js` passes the drawing function to the runtime:
 
 ```js

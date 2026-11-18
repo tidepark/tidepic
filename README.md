@@ -42,6 +42,7 @@ A scene (a companion) can be made in two ways: from a few pictures and a case ta
 
 - [`examples/table/`](examples/table) is an example made with a case table and a few pictures. It has no drawing code. It runs at [tidepic.com/examples/table/](https://tidepic.com/examples/table/?v=20&to=100&num=1).
 - To make your own, copy that folder, replace the pictures, and edit `scenes.json`. Serve the folder with any static file server. If a skin shows a Lottie file, keep `examples/vendor/` next to it: the page loads the Lottie player from there ([lottie-web](https://github.com/airbnb/lottie-web), MIT).
+- [`examples/code/`](examples/code) is an example drawn with code: a small water scene in `draw.js`, with no pictures. It runs at [tidepic.com/examples/code/](https://tidepic.com/examples/code/?v=60&to=100). To make your own, copy the folder and change `draw.js`.
 
 ## What is in this repository
 
@@ -52,6 +53,7 @@ A scene (a companion) can be made in two ways: from a few pictures and a case ta
 | [COMPANION.md](COMPANION.md), [COMPANION.ko.md](COMPANION.ko.md) | Making a companion |
 | [`runtime/`](runtime) | The runtime that plays what the spec describes. It checks a feed, computes the values, judges the conditions, and plays a companion. Plain JavaScript modules with no build step and no dependencies (playing a Lottie file is the one exception: it needs `lottie-web`). `npm test` runs its tests |
 | [`examples/table/`](examples/table) | An example companion made with a case table |
+| [`examples/code/`](examples/code) | An example companion drawn with code |
 | [CHANGELOG.md](CHANGELOG.md) | What changed |
 
 tidepic is the name of the rules. [Tidepark](https://tidepark.com) is the place that shows companions built with them. The companions on tidepark.com are not in this repository.

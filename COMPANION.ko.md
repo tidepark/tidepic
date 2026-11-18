@@ -86,6 +86,8 @@ start({ canvas: document.getElementById("scene") });
 
 ## 5. 그리기 코드
 
+[본보기](examples/code/)에서 시작합니다. 폴더를 복사해 `draw.js`를 고칩니다.
+
 `main.js`가 그리기 함수를 런타임에 넘깁니다.
 
 ```js

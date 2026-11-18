@@ -1,0 +1,16 @@
+{
+  "slug": "template",
+  "name": { "en": "Template", "ko": "틀" },
+  "spec": 1,
+  "made": "code",
+  "grade": "basic",
+  "still": true,
+  "reads": {
+    "values": 1,
+    "needs": ["fill"],
+    "step": false,
+    "events": [],
+    "extra": []
+  },
+  "skins": ["plain"]
+}

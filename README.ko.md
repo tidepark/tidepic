@@ -42,6 +42,7 @@ AI 에게 맡기려면 `https://tidepic.com/GUIDE.ko.md`를 주고 무엇을 보
 
 - [`examples/table/`](examples/table)은 경우표와 그림 몇 장으로 만든 본보기입니다. 그리기 코드가 없습니다. [tidepic.com/examples/table/](https://tidepic.com/examples/table/?v=20&to=100&num=1)에서 돌고 있습니다.
 - 직접 만들려면 이 폴더를 복사해 그림을 바꾸고 `scenes.json`을 고칩니다. 정적 파일 서버 아무것으로나 그 폴더를 열면 됩니다. 스킨이 Lottie 파일을 보여 준다면 `examples/vendor/`를 옆에 같이 둡니다. 페이지가 거기서 Lottie 재생기를 불러옵니다([lottie-web](https://github.com/airbnb/lottie-web), MIT).
+- [`examples/code/`](examples/code)는 코드로 그린 본보기입니다. 그림 없이 `draw.js`로 물이 차오르는 작은 장면을 그립니다. [tidepic.com/examples/code/](https://tidepic.com/examples/code/?v=60&to=100)에서 돌고 있습니다. 직접 만들려면 이 폴더를 복사해 `draw.js`를 고칩니다.
 
 ## 이 저장소에 있는 것
 
@@ -52,6 +53,7 @@ AI 에게 맡기려면 `https://tidepic.com/GUIDE.ko.md`를 주고 무엇을 보
 | [COMPANION.ko.md](COMPANION.ko.md), [COMPANION.md](COMPANION.md) | 컴패니언 만드는 법 |
 | [`runtime/`](runtime) | 규칙에 적힌 것을 실제로 돌리는 실행기. 피드를 검사하고, 값을 계산하고, 조건을 판정하고, 컴패니언을 틉니다. 빌드 없이 쓰는 JavaScript 모듈이고 딸린 꾸러미가 없습니다(Lottie 를 틀 때만 `lottie-web`이 필요합니다). `npm test`로 테스트를 돌립니다 |
 | [`examples/table/`](examples/table) | 경우표로 만든 본보기 컴패니언 |
+| [`examples/code/`](examples/code) | 코드로 그린 본보기 컴패니언 |
 | [CHANGELOG.md](CHANGELOG.md) | 바뀐 내용 |
 
 tidepic 은 규칙의 이름이고, [Tidepark](https://tidepark.com)은 이 규칙으로 만든 컴패니언을 모아 보여 주는 곳입니다. tidepark.com 의 컴패니언은 이 저장소에 없습니다.

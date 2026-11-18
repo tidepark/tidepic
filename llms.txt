@@ -27,3 +27,5 @@ If you are asked to connect some data to a tidepic scene, you are being asked to
 
 - [Case table example](https://tidepic.com/examples/table/?v=50&to=100&num=1): a companion made from a table and images, with no drawing code
 - [Its files](https://github.com/tidepark/tidepic/tree/main/examples/table): `scenes.json` and the images, as a starting point for a companion of your own
+- [Drawing code example](https://tidepic.com/examples/code/?v=60&to=100): a companion drawn with code (`draw.js`), with no pictures
+- [Its files](https://github.com/tidepark/tidepic/tree/main/examples/code): `draw.js` and the settings, as a starting point for a companion drawn with code
