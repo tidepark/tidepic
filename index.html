@@ -26,7 +26,10 @@
   var chosen = m && m[1];
   var inside = document.referrer.indexOf(location.origin + "/") === 0;
   var first = (navigator.languages && navigator.languages[0]) || navigator.language || "";
-  if (chosen === "ko" || (!chosen && !inside && /^ko\b/i.test(first))) location.replace("ko.html");
+  if (chosen === "ko" || (!chosen && !inside && /^ko\b/i.test(first))) {
+    window.tidepicLeaving = true;
+    location.replace("ko.html");
+  }
 })();
 </script>
 <link rel="stylesheet" href="home.css">
@@ -100,6 +103,7 @@
   </div>
 </main>
 <script src="lang.js"></script>
+<script src="ga.js"></script>
 <script src="home.js"></script>
 </body>
 </html>
