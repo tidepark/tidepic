@@ -100,6 +100,12 @@ A range has a direction. `"from": 30, "to": 0` is days left, counting down from 
 }
 ```
 
+A `state` at the top of the feed applies to every value. A value that has its own uses that one instead. Below, the market has closed so everything is resting, and only the second value is broken.
+
+```json
+{ "spec": 1, "values": [{ "value": 42, "to": 100 }, { "value": 40, "to": 100, "state": "fault" }], "state": "idle" }
+```
+
 How much, how fast and how well are numbers, not states. Do not invent states. One that is not in the table is ignored.
 
 `event` marks a moment that just happened, such as a goal being reached. `type` is a short lowercase word and `at` is a Unix time in seconds. A new `at` means a new event.
@@ -121,9 +127,33 @@ How much, how fast and how well are numbers, not states. Do not invent states. O
 }
 ```
 
-- `view.title` is up to 40 characters. `view.num` shows or hides the number. `view.skin` picks one of the companion's skins by name.
 - `meta.ttl` is the least number of seconds before the feed should be asked for again.
-- What is written in the companion's address wins over `view`.
+
+### Picking the look with `view`
+
+| Field | What to write |
+|---|---|
+| `skin` | The name of one of the companion's skins |
+| `options` | Values for the skin's options. Each skin has its own names and ranges |
+| `title` | A title, up to 40 characters |
+| `titleAt` | Where the title goes: one of `tl` `tc` `tr` `ml` `mc` `mr` `bl` `bc` `br` |
+| `num` | `true` shows the number, `false` hides it |
+| `numAt` | Where the number goes. Same names as `titleAt` |
+
+Here is a feed for Tidepark's Garden (`garden`) with a skin, options, a title and the number all at once.
+
+```json
+{
+  "spec": 1,
+  "values": [{ "value": 1, "to": 1 }, { "value": 0.6, "to": 1 }, { "value": 0, "to": 1, "state": "idle" }],
+  "view": { "skin": "meadow", "options": { "petals": 7, "from": "#ffb000" }, "title": "Servers", "num": true }
+}
+```
+
+- In a feed a color is written `#rrggbb`. The same color in a companion's address is written without `#`: `skin.from=ffb000`.
+- What is written in the companion's address (`skin=`, `skin.<name>=`, `title=`, `num=`) wins over `view`. If the address has `skin=`, the feed's `view.skin` is not used.
+- A skin the companion does not have, an option the skin does not take, and a value outside its range are dropped. The rest is still used.
+- Which skins and options there are depends on the companion. For Tidepark's companions, pick a skin and settings on a scene's page in the [gallery](https://tidepark.com/gallery) and it shows the JSON with those settings in `view`. Copy it and change the numbers. Each companion's skin names and options are also listed at https://tidepark.com/llms.txt.
 
 ## 6. Limits
 
@@ -133,6 +163,7 @@ How much, how fast and how well are numbers, not states. Do not invent states. O
 | `values` | 64 |
 | Text | 64 characters, 8 for `unit`, 40 for `view.title` |
 | `history` | 60 per value |
+| `view.options` | 16. Names up to 32 characters, values a number or text up to 32 characters |
 
 Numbers must be finite. Text cannot contain `<`, `>` or an address. Anything over a limit or of the wrong type is dropped, not repaired, and the rest of the feed is still used.
 

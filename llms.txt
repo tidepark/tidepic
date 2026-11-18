@@ -11,6 +11,11 @@ If you are asked to connect some data to a tidepic scene, you are being asked to
 - [Guide for making a companion](https://tidepic.com/COMPANION.md): deciding what the numbers become, the two ways to make one (a case table, or drawing code), the files, images, and how to check it
 - [안내: 컴패니언 만드는 법](https://tidepic.com/COMPANION.ko.md): the same guide in Korean
 
+## Scenes to connect to
+
+- [Tidepark gallery](https://tidepark.com/gallery): companions you can connect a feed to. Each scene's page lets you pick a skin and settings and shows the feed JSON with them in `view`, ready to copy
+- [Tidepark llms.txt](https://tidepark.com/llms.txt): each scene's address, skin names, options, still picture and sample feed
+
 ## Reference
 
 - [The spec](https://tidepic.com/SPEC.md): the full rules. The current version is at the top
