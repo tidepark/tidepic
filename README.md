@@ -5,7 +5,7 @@ A scene is for reading the mood, not the exact number.
 
 [한국어](README.ko.md) · [tidepic.com](https://tidepic.com) · [Gallery (Tidepark)](https://tidepark.com/gallery) · [Feed checker](https://tidepic.com/check.html)
 
-[![Six panels reading the same line of JSON: the usual readout and five scenes (a vase, a face, a campfire, a fishbowl, bamboo).](https://tidepark.com/og/tidepic.jpg)](https://tidepic.com)
+[![Six panels reading the same line of JSON: the usual readout and five scenes (a vase, a face, a campfire, a library, bamboo).](https://tidepark.com/og/tidepic.jpg)](https://tidepic.com)
 
 ## One line becomes a scene
 

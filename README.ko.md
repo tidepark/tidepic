@@ -5,7 +5,7 @@
 
 [English](README.md) · [tidepic.com](https://tidepic.com/ko.html) · [갤러리 (Tidepark)](https://tidepark.com/ko/gallery) · [피드 확인기](https://tidepic.com/check.ko.html)
 
-[![같은 JSON 한 줄을 읽는 여섯 칸. 흔히 보는 숫자판과 장면 다섯(꽃병, 표정, 모닥불, 어항, 대나무숲).](https://tidepark.com/og/tidepic.jpg)](https://tidepic.com/ko.html)
+[![같은 JSON 한 줄을 읽는 여섯 칸. 흔히 보는 숫자판과 장면 다섯(꽃병, 표정, 모닥불, 도서관, 대나무숲).](https://tidepark.com/og/tidepic.jpg)](https://tidepic.com/ko.html)
 
 ## 한 줄이 장면이 됩니다
 
