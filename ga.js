@@ -2,6 +2,8 @@
 // examples/ 의 본보기 컴패니언은 이 파일을 부르지 않는다.
 // index.html 이 다른 언어 페이지로 보내는 중이면 건너뛴다(한 번 온 것을 두 번 세지 않게).
 (function () {
+  // 이 저장소를 복사해 다른 주소에 띄운 페이지나 내 컴퓨터에서 연 페이지는 세지 않는다.
+  if (location.hostname !== "tidepic.com") return;
   if (window.tidepicLeaving) return;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
