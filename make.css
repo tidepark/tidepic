@@ -7,8 +7,14 @@ h2 { margin: 2.5rem 0 0; }
 .value input { width: 100%; accent-color: var(--ink); }
 .value output { text-align: right; font-variant-numeric: tabular-nums; }
 .slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin: 1rem 0 0; }
-.slot { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.35rem; border-radius: 0.75rem; text-align: left; line-height: 1.3; }
+.slot { position: relative; border: 1px solid var(--line); border-radius: 0.75rem; }
+.slot:hover { border-color: var(--ink); }
 .slot.on { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.slot.dragging { opacity: 0.4; }
+.slot.over { outline: 2px dashed var(--ink); outline-offset: 2px; }
+.pick { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.35rem; border-radius: 0.75rem; line-height: 1.3; cursor: pointer; }
+.pick:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.remove { position: absolute; top: 0.6rem; right: 0.6rem; width: 1.5rem; height: 1.5rem; padding: 0; background: var(--paper); line-height: 1; }
 .slot strong { font-size: 0.9rem; }
 .slot small { color: var(--muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
 .thumb { display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: 0.5rem; overflow: hidden;

@@ -11,8 +11,10 @@ const TEXT = {
   ko: {
     levels: ["비었음", "낮음", "중간", "높음", "가득"],
     choose: "그림 넣기",
+    remove: (level) => `${level} 칸의 그림 빼기`,
+    none: "그림을 넣어 주세요.",
     example: "지금 보이는 것은 본보기입니다(Tidepark 의 꽃병). 내 그림을 넣으면 본보기는 사라집니다.",
-    own: (n) => `그림 ${n}장. 빈 칸은 가장 가까운 칸의 그림을 씁니다.`,
+    own: (n) => `그림 ${n}장. 칸을 끌면 자리를 옮깁니다. 빈 칸은 가장 가까운 칸의 그림을 씁니다.`,
     cantRead: "이 브라우저에서 읽을 수 없는 파일입니다.",
     noDecoder: "이 브라우저는 GIF 를 나누지 못합니다. 크롬 같은 다른 브라우저에서 열거나, 그림을 따로 넣어 주세요.",
     needOwn: "내려받으려면 내 그림을 두 장 이상 넣어 주세요.",
@@ -24,8 +26,10 @@ const TEXT = {
   en: {
     levels: ["Empty", "Low", "Middle", "High", "Full"],
     choose: "Add a picture",
+    remove: (level) => `Remove the picture in ${level}`,
+    none: "Put in a picture.",
     example: "This is the example: the vase from Tidepark. It goes away when you put in a picture of your own.",
-    own: (n) => `${n} picture${n === 1 ? "" : "s"}. An empty slot uses the picture of the nearest slot.`,
+    own: (n) => `${n} picture${n === 1 ? "" : "s"}. Drag a slot to move it. An empty slot uses the picture of the nearest slot.`,
     cantRead: "This browser cannot read that file.",
     noDecoder: "This browser cannot split a GIF. Open this page in another browser such as Chrome, or put in separate pictures.",
     needOwn: "Put in at least two pictures of your own to download.",
@@ -57,6 +61,7 @@ let stage = null;
 let memory;
 let shownLevel = "";
 let target = 0; // 그림을 넣을 칸
+let dragging = null; // 끌고 있는 칸
 
 const fileName = (k) => `${LEVELS[k]}.${slots[k].ext}`;
 
@@ -146,16 +151,21 @@ function renderSlots() {
   const box = $("slots");
   box.replaceChildren(
     ...slots.map((slot, k) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "slot";
-      button.dataset.level = LEVELS[k];
+      const item = document.createElement("div");
+      item.className = "slot";
+      item.dataset.level = LEVELS[k];
+      // 누르면 그림을 넣는 곳. 버튼 요소는 끌리지 않는 브라우저가 있어 div 로 둔다.
+      const pick = document.createElement("div");
+      pick.className = "pick";
+      pick.role = "button";
+      pick.tabIndex = 0;
       const frame = document.createElement("span");
       frame.className = "thumb";
       if (slot) {
         const image = document.createElement("img");
         image.src = slot.thumb;
         image.alt = "";
+        image.draggable = false;
         frame.append(image);
       } else {
         frame.textContent = t.choose;
@@ -164,18 +174,56 @@ function renderSlots() {
       name.textContent = t.levels[k];
       const numbers = document.createElement("small");
       numbers.textContent = RANGES[k];
-      button.append(frame, name, numbers);
-      button.addEventListener("click", () => {
+      pick.append(frame, name, numbers);
+      const choose = () => {
         target = k;
         $("pick-one").click();
-      });
-      button.addEventListener("dragover", (event) => event.preventDefault());
-      button.addEventListener("drop", (event) => {
+      };
+      pick.addEventListener("click", choose);
+      pick.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        const file = event.dataTransfer.files[0];
-        if (file) setOne(k, file);
+        choose();
       });
-      return button;
+      item.append(pick);
+      if (slot && !example) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove";
+        remove.textContent = "×";
+        remove.setAttribute("aria-label", t.remove(t.levels[k]));
+        remove.addEventListener("click", () => removeOne(k));
+        item.append(remove);
+      }
+      // 그림이 있는 칸은 끌어서 옮긴다. 파일을 끌어다 놓으면 그 칸에 넣는다.
+      item.draggable = Boolean(slot);
+      item.addEventListener("dragstart", (event) => {
+        dragging = k;
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", LEVELS[k]);
+        item.classList.add("dragging");
+      });
+      item.addEventListener("dragend", () => {
+        dragging = null;
+        item.classList.remove("dragging");
+      });
+      item.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        if (dragging !== k) item.classList.add("over");
+      });
+      item.addEventListener("dragleave", (event) => {
+        if (!item.contains(event.relatedTarget)) item.classList.remove("over");
+      });
+      item.addEventListener("drop", (event) => {
+        event.preventDefault();
+        item.classList.remove("over");
+        const from = dragging;
+        dragging = null;
+        const file = event.dataTransfer.files[0];
+        if (from !== null) moveOne(from, k);
+        else if (file) setOne(k, file);
+      });
+      return item;
     }),
   );
   shownLevel = "";
@@ -189,7 +237,11 @@ function rebuild() {
     if (slot) files[fileName(k)] = slot.media;
   });
   stage = count ? createStage({ table: readScenes(tableJson("preview", "preview")).table, files, seed: "make" }) : null;
-  note.textContent = example ? t.example : t.own(count);
+  if (!stage) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  note.textContent = example ? t.example : count ? t.own(count) : t.none;
   note.classList.remove("bad");
 }
 
@@ -209,6 +261,26 @@ async function setOne(k, file) {
   } catch {
     fail(t.cantRead);
   }
+}
+
+function removeOne(k) {
+  URL.revokeObjectURL(slots[k].thumb);
+  slots[k] = null;
+  rebuild();
+}
+
+// 빈 칸에 놓으면 그 칸으로 옮기고, 그림이 있는 칸에 놓으면 그 자리에 끼워 넣고 사이의 칸을 한 칸씩 민다.
+function moveOne(from, to) {
+  if (from === to) return;
+  const slot = slots[from];
+  if (slots[to]) {
+    slots.splice(from, 1);
+    slots.splice(to, 0, slot);
+  } else {
+    slots[to] = slot;
+    slots[from] = null;
+  }
+  rebuild();
 }
 
 // ---------- 미리 보기: 실행기가 하는 대로 값을 계산하고, 조건을 판정하고, 경우표의 장면을 그린다
