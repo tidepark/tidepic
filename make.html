@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make a companion — tidepic</title>
+<meta name="description" content="Turn a few pictures or one GIF into a tidepic companion: a scene that changes with a number.">
+<link rel="alternate" hreflang="en" href="https://tidepic.com/make.html">
+<link rel="alternate" hreflang="ko" href="https://tidepic.com/make.ko.html">
+<link rel="stylesheet" href="check.css">
+<link rel="stylesheet" href="make.css">
+</head>
+<body>
+<main>
+  <div class="bar">
+    <a class="home" href="./">← tidepic</a>
+    <a class="lang" href="make.ko.html" lang="ko" hreflang="ko" data-lang="ko">한국어</a>
+  </div>
+  <h1>Make a companion</h1>
+  <p>Put in a few pictures of the same thing, from empty to full, or one GIF. This page turns them into a companion: a scene that changes with a number.</p>
+  <p>Your pictures stay inside this browser. They are not sent anywhere.</p>
+  <div class="scene"><canvas id="scene"></canvas></div>
+  <div class="value">
+    <label for="value">Number</label>
+    <input id="value" type="range" min="0" max="100" value="60">
+    <output id="shown" for="value">60</output>
+  </div>
+  <div class="slots" id="slots"></div>
+  <p class="note" id="note" aria-live="polite"></p>
+  <div class="examples">
+    <button type="button" id="many">Several pictures at once</button>
+    <button type="button" id="gif">One GIF</button>
+    <button type="button" id="flip">Reverse the order</button>
+    <button type="button" id="example">Back to the example</button>
+  </div>
+  <input type="file" id="pick-one" accept="image/*" hidden>
+  <input type="file" id="pick-many" accept="image/*" multiple hidden>
+  <input type="file" id="pick-gif" accept="image/gif,image/webp,image/apng" hidden>
+  <h2>Take it with you</h2>
+  <label for="name">Name</label>
+  <input id="name" type="text" maxlength="40" autocomplete="off">
+  <button type="button" class="solid" id="download">Download as a folder (.zip)</button>
+  <p>The folder holds plain files: your pictures, a case table, and the runtime. Put it on a web host and open <code>index.html?v=30&amp;to=100</code> there. Opening the file by double-clicking does not work.</p>
+  <footer>
+    The five steps are the <code>level</code> condition in section 3.7 of the <a href="https://github.com/tidepark/tidepic/blob/main/SPEC.md">spec</a>, and what you download is a companion made with a case table (section 7.1). More kinds of scenes are in <a href="COMPANION.md">Making a companion</a>. The example pictures are the vase from the <a href="https://tidepark.com/gallery/vase">Tidepark gallery</a>; they are not part of the download.
+  </footer>
+</main>
+<script type="module" src="make.js"></script>
+<script src="lang.js"></script>
+<script src="ga.js"></script>
+</body>
+</html>

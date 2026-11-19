@@ -20,6 +20,16 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/check.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/check.ko.html"/>
   </url>
+  <url>
+    <loc>https://tidepic.com/make.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/make.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/make.ko.html"/>
+  </url>
+  <url>
+    <loc>https://tidepic.com/make.ko.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tidepic.com/make.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://tidepic.com/make.ko.html"/>
+  </url>
   <url><loc>https://tidepic.com/examples/table/</loc></url>
   <url><loc>https://tidepic.com/examples/code/</loc></url>
   <url><loc>https://tidepic.com/GUIDE.md</loc></url>

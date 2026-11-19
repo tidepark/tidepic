@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>컴패니언 만들기 — tidepic</title>
+<meta name="description" content="그림 몇 장이나 GIF 한 편으로, 숫자에 따라 바뀌는 tidepic 컴패니언을 만듭니다.">
+<link rel="alternate" hreflang="en" href="https://tidepic.com/make.html">
+<link rel="alternate" hreflang="ko" href="https://tidepic.com/make.ko.html">
+<link rel="stylesheet" href="check.css">
+<link rel="stylesheet" href="make.css">
+</head>
+<body>
+<main>
+  <div class="bar">
+    <a class="home" href="ko.html">← tidepic</a>
+    <a class="lang" href="make.html" lang="en" hreflang="en" data-lang="en">English</a>
+  </div>
+  <h1>컴패니언 만들기</h1>
+  <p>같은 것을 비었을 때부터 가득 찼을 때까지 찍은 그림 몇 장, 또는 GIF 한 편을 넣어 주세요. 숫자에 따라 바뀌는 장면, 컴패니언이 됩니다.</p>
+  <p>넣은 그림은 이 브라우저 안에만 있습니다. 어디에도 보내지 않습니다.</p>
+  <div class="scene"><canvas id="scene"></canvas></div>
+  <div class="value">
+    <label for="value">숫자</label>
+    <input id="value" type="range" min="0" max="100" value="60">
+    <output id="shown" for="value">60</output>
+  </div>
+  <div class="slots" id="slots"></div>
+  <p class="note" id="note" aria-live="polite"></p>
+  <div class="examples">
+    <button type="button" id="many">그림 여러 장 한꺼번에</button>
+    <button type="button" id="gif">GIF 한 편</button>
+    <button type="button" id="flip">순서 뒤집기</button>
+    <button type="button" id="example">본보기로 돌아가기</button>
+  </div>
+  <input type="file" id="pick-one" accept="image/*" hidden>
+  <input type="file" id="pick-many" accept="image/*" multiple hidden>
+  <input type="file" id="pick-gif" accept="image/gif,image/webp,image/apng" hidden>
+  <h2>가져가기</h2>
+  <label for="name">이름</label>
+  <input id="name" type="text" maxlength="40" autocomplete="off">
+  <button type="button" class="solid" id="download">폴더로 내려받기 (.zip)</button>
+  <p>폴더에는 넣은 그림, 경우표, 실행기가 파일 그대로 들어 있습니다. 웹에 올리고 그 주소에서 <code>index.html?v=30&amp;to=100</code> 을 엽니다. 파일을 두 번 눌러 여는 것으로는 동작하지 않습니다.</p>
+  <footer>
+    다섯 단계는 <a href="https://github.com/tidepark/tidepic/blob/main/SPEC.ko.md">규칙</a> 3.7절의 <code>level</code> 조건이고, 내려받는 것은 경우표로 만든 컴패니언입니다(7.1절). 다른 모습의 장면은 <a href="COMPANION.ko.md">컴패니언 만드는 법</a>에 있습니다. 본보기 그림은 <a href="https://tidepark.com/ko/gallery/vase">Tidepark 갤러리</a>의 꽃병이고, 내려받는 폴더에는 들어가지 않습니다.
+  </footer>
+</main>
+<script type="module" src="make.js"></script>
+<script src="lang.js"></script>
+<script src="ga.js"></script>
+</body>
+</html>

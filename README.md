@@ -3,7 +3,7 @@
 **Rules for showing numbers as scenes instead of charts.**
 A scene is for reading the mood, not the exact number.
 
-[한국어](README.ko.md) · [tidepic.com](https://tidepic.com) · [Gallery (Tidepark)](https://tidepark.com/gallery) · [Feed checker](https://tidepic.com/check.html)
+[한국어](README.ko.md) · [tidepic.com](https://tidepic.com) · [Gallery (Tidepark)](https://tidepark.com/gallery) · [Feed checker](https://tidepic.com/check.html) · [Make a companion](https://tidepic.com/make.html)
 
 [![Six panels reading the same line of JSON: the usual readout and five scenes (a vase, a face, a campfire, a library, bamboo).](https://tidepark.com/og/tidepic.jpg)](https://tidepic.com)
 

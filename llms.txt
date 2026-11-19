@@ -22,6 +22,7 @@ If you are asked to connect some data to a tidepic scene, you are being asked to
 - [The spec](https://tidepic.com/SPEC.md): the full rules. The current version is at the top
 - [규칙](https://tidepic.com/SPEC.ko.md): the spec in Korean
 - [Feed checker](https://tidepic.com/check.html): paste a feed and see what a companion will draw from it
+- [Companion maker](https://tidepic.com/make.html): put in a few pictures or one GIF, see them change with a number, and download a companion made with a case table
 - [Runtime source](https://github.com/tidepark/tidepic/tree/main/runtime): validation and computation in JavaScript (`validateFeed`, `computeFeed`, `checkFeed`)
 
 ## Examples
